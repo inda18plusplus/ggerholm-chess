@@ -1,5 +1,6 @@
 package chess;
 
+import chess.pieces.King;
 import chess.pieces.Pawn;
 import chess.pieces.Piece;
 import chess.pieces.Queen;
@@ -31,7 +32,7 @@ public class Board {
         case 6:
         case 7:
           pieces.add(new Pawn(1, i, true));
-          pieces.add(new Pawn(6, i, true));
+          pieces.add(new Pawn(6, i, false));
           break;
         case 8:
         case 15:
@@ -44,9 +45,11 @@ public class Board {
           break;
         case 11:
           pieces.add(new Queen(0, i % 8, true));
-          pieces.add(new Queen(7, i % 8, true));
+          pieces.add(new Queen(7, i % 8, false));
           break;
         case 12:
+          pieces.add(new King(0, i % 8, true));
+          pieces.add(new King(7, i % 8, false));
           break;
       }
 
@@ -79,22 +82,22 @@ public class Board {
   }
 
   public boolean moveTo(int row, int col) {
-    if (selected != null && selected.canMoveTo(row, col)) {
-      Action action = new Action(selected, row, col, Action.Type.Move);
-      if (selected.notAllowed(this, action)) {
-        return false;
-      }
-
-      selected.moveTo(row, col);
-      actionTaken(action);
-      return true;
+    if (selected == null) {
+      return false;
     }
 
-    return false;
+    Action action = new Action(selected, row, col, Action.Type.Move);
+    if (selected.notAllowed(this, action)) {
+      return false;
+    }
+
+    selected.moveTo(row, col);
+    actionTaken(action);
+    return true;
   }
 
   public boolean killAt(int row, int col) {
-    if (selected == null || !selected.canAttackAt(row, col)) {
+    if (selected == null) {
       return false;
     }
 

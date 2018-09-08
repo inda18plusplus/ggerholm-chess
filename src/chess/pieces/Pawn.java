@@ -1,6 +1,8 @@
 package chess.pieces;
 
-import chess.rules.RuleNoOverlap;
+import chess.Action;
+import chess.Board;
+import chess.rules.Rule;
 
 public class Pawn extends Piece {
 
@@ -9,7 +11,7 @@ public class Pawn extends Piece {
   public Pawn(int row, int col, boolean isTop) {
     super(row, col, isTop);
 
-    rules.add(new RuleNoOverlap());
+    rules.remove(Rule.ATTACK_MOVE);
 
   }
 
@@ -35,16 +37,26 @@ public class Pawn extends Piece {
   }
 
   @Override
-  public boolean canMoveTo(int row, int col) {
-    return positions[row][col] == 1;
-  }
+  public boolean notAllowed(Board board, Action action) {
+    if (action.getType().equals(Action.Type.Attack)) {
+      int row = action.row();
+      int col = action.col();
+      boolean condition;
 
-  @Override
-  public boolean canAttackAt(int row, int col) {
-    if (isTop()) {
-      return row == row() - 1 && (col == col() - 1 || col == col() + 1);
+      if (isTop()) {
+        condition = row == row() - 1 && (col == col() - 1 || col == col() + 1);
+        if (!condition) {
+          return true;
+        }
+      } else {
+        condition = row == row() + 1 && (col == col() - 1 || col == col() + 1);
+        if (!condition) {
+          return true;
+        }
+      }
     }
-    return row == row() + 1 && (col == col() - 1 || col == col() + 1);
+
+    return super.notAllowed(board, action);
   }
 
 }

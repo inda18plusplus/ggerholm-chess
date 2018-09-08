@@ -20,6 +20,10 @@ public abstract class Piece {
     this.col = col;
     this.isTop = isTop;
 
+    rules.add(Rule.MOVEMENT);
+    rules.add(Rule.NO_OVERLAP);
+    rules.add(Rule.ATTACK_MOVE);
+
     redoPositions();
   }
 
@@ -41,10 +45,6 @@ public abstract class Piece {
   public boolean isAt(int row, int col) {
     return this.row == row && this.col == col;
   }
-
-  public abstract boolean canMoveTo(int row, int col);
-
-  public abstract boolean canAttackAt(int row, int col);
 
   abstract void calculatePossiblePositions();
 
