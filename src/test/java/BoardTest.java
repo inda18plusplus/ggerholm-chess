@@ -9,8 +9,8 @@ public class BoardTest {
     Board b = Board.getInstance().getEngine();
     b.setupStandardBoard();
 
-    Assert.assertFalse(b.isSquareUnderAttack(2, 0, true));
-    Assert.assertTrue(b.isSquareUnderAttack(2, 0, false));
+    Assert.assertFalse(b.isSquareUnderAttack(2, 0, true, false));
+    Assert.assertTrue(b.isSquareUnderAttack(2, 0, false, false));
 
   }
 

@@ -33,7 +33,7 @@ public class RuleKingCastling implements Rule {
 
     int dir = (int) Math.signum(target.col() - piece.col());
     for (int i = 0; i < 3; i++) {
-      if (board.isSquareUnderAttack(piece.row(), piece.col() + i * dir, piece.isTop())) {
+      if (board.isSquareUnderAttack(piece.row(), piece.col() + i * dir, piece.isTop(), false)) {
         return false;
       }
     }

@@ -183,12 +183,7 @@ public final class Board implements BoardInterface {
     return turn % 2 == 0;
   }
 
-  /**
-   * Returns whether or not the king is currently threatened.
-   *
-   * @param isTop Whether to check the top or bottom king.
-   * @return True or false.
-   */
+  @Override
   public boolean isKingInCheck(boolean isTop) {
     Piece king = pieces
             .stream()
@@ -200,7 +195,7 @@ public final class Board implements BoardInterface {
       return false;
     }
 
-    return isSquareUnderAttack(king.row(), king.col(), king.isTop());
+    return isSquareUnderAttack(king.row(), king.col(), king.isTop(), false);
   }
 
   @Override
@@ -266,16 +261,12 @@ public final class Board implements BoardInterface {
   /**
    * Returns whether or not a square is potentially under attack.
    *
-   * @param row   The row number.
-   * @param col   The column number.
-   * @param isTop Assumes the square has a unit from this team.
+   * @param row    The row number.
+   * @param col    The column number.
+   * @param isTop  Assumes the square has a unit from this team.
+   * @param isPawn A pawn can also be attacked using its special move, unlike other pieces.
    * @return True if any unit the enemy team could mount an attack towards this square.
    */
-  public boolean isSquareUnderAttack(int row, int col, boolean isTop) {
-    return isSquareUnderAttack(row, col, isTop, false);
-  }
-
-  @Override
   public boolean isSquareUnderAttack(int row, int col, boolean isTop, boolean isPawn) {
 
     if (isPawn

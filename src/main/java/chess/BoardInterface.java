@@ -14,7 +14,13 @@ public interface BoardInterface {
 
   boolean killAt(int row, int col);
 
-  boolean isSquareUnderAttack(int row, int col, boolean isTop, boolean isPawn);
+  /**
+   * Returns whether or not the king is currently threatened.
+   *
+   * @param isTop Whether to check the top or bottom king.
+   * @return True or false.
+   */
+  boolean isKingInCheck(boolean isTop);
 
   boolean isPromoting();
 
