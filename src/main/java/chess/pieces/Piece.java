@@ -4,15 +4,17 @@ import chess.Action;
 import chess.Board;
 import chess.rules.Rule;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Piece {
+public abstract class Piece implements Serializable {
 
   private int row, col;
   private boolean isTop;
+  boolean hasMoved;
 
-  int[][] positions;
+  int[][] positions, attackPositions;
   final List<Rule> rules = new ArrayList<>();
 
   Piece(int row, int col, boolean isTop) {
@@ -23,23 +25,36 @@ public abstract class Piece {
     rules.add(Rule.MOVEMENT);
     rules.add(Rule.NO_OVERLAP);
     rules.add(Rule.ATTACK_MOVE);
+    rules.add(Rule.NO_CHANGE);
 
     redoPositions();
   }
 
   private void redoPositions() {
-    positions = new int[Board.GAME_HEIGHT][Board.GAME_WIDTH];
+    positions = new int[Board.GAME_SIZE][Board.GAME_SIZE];
+    attackPositions = new int[Board.GAME_SIZE][Board.GAME_SIZE];
     calculatePossiblePositions();
   }
 
   public int[][] getPossiblePositions() {
     return positions;
   }
+  public int[][] getPossibleAttackPositions() {
+    return attackPositions;
+  }
+
+  public boolean hasMoved() {
+    return hasMoved;
+  }
 
   public void moveTo(int row, int col) {
-    this.row = row;
-    this.col = col;
-    redoPositions();
+    if (this.row != row || this.col != col) {
+      this.row = row;
+      this.col = col;
+      hasMoved = true;
+
+      redoPositions();
+    }
   }
 
   public boolean isAt(int row, int col) {
@@ -60,8 +75,12 @@ public abstract class Piece {
     return isTop;
   }
 
-  public boolean notAllowed(Board board, Action action) {
-    return !rules.stream().allMatch(m -> m.isActionAllowed(board, action));
+  public final boolean notAllowed(Board board, Action action) {
+    if (rules.stream().anyMatch(m -> m.isSuperior() && m.isActionAllowed(board, action))) {
+      return false;
+    }
+
+    return !rules.stream().filter(m -> !m.isSuperior()).allMatch(m -> m.isActionAllowed(board, action));
   }
 
 }

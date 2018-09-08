@@ -1,6 +1,7 @@
 package chess;
 
 import chess.pieces.Piece;
+import org.apache.commons.lang3.SerializationUtils;
 
 public final class Action {
 
@@ -13,7 +14,7 @@ public final class Action {
   private Type type;
 
   public Action(Piece piece, int row, int col, Type type) {
-    this.piece = piece;
+    this.piece = SerializationUtils.clone(piece);
     this.row = row;
     this.col = col;
     this.type = type;
@@ -33,6 +34,10 @@ public final class Action {
 
   public Type getType() {
     return type;
+  }
+
+  public String toString() {
+    return String.format("%s %s (%d, %d) (%d, %d)", type.toString(), piece.getClass().getSimpleName(), piece.row(), piece.col(), row, col);
   }
 
 }

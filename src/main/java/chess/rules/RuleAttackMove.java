@@ -2,6 +2,7 @@ package chess.rules;
 
 import chess.Action;
 import chess.Board;
+import chess.pieces.King;
 import chess.pieces.Piece;
 
 public class RuleAttackMove implements Rule {
@@ -15,6 +16,16 @@ public class RuleAttackMove implements Rule {
     Piece p = action.getPiece();
     Piece target = board.getAt(action.row(), action.col());
 
-    return p.isTop() != target.isTop() && p.getPossiblePositions()[action.row()][action.col()] == 1;
+    if (target instanceof King) {
+      return false;
+    }
+
+    return p.isTop() != target.isTop() && p.getPossibleAttackPositions()[target.row()][target.col()] == 1;
   }
+
+  @Override
+  public boolean isSuperior() {
+    return false;
+  }
+
 }

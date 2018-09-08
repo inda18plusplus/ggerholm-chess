@@ -21,6 +21,9 @@ public class Queen extends Piece {
       Utils.tryPutAt(m -> positions[row() - m][col() - m] = 1, i);
 
     }
+
+    positions[row()][col()] = 0;
+    attackPositions = positions;
   }
 
 }

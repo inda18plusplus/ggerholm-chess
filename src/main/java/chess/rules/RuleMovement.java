@@ -14,4 +14,9 @@ public class RuleMovement implements Rule {
     return action.getPiece().getPossiblePositions()[action.row()][action.col()] == 1;
   }
 
+  @Override
+  public boolean isSuperior() {
+    return false;
+  }
+
 }

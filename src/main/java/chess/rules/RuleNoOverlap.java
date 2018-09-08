@@ -49,4 +49,9 @@ public final class RuleNoOverlap implements Rule {
     return true;
   }
 
+  @Override
+  public boolean isSuperior() {
+    return false;
+  }
+
 }
