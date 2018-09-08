@@ -5,6 +5,13 @@ import chess.rules.Rule;
 
 public class Knight extends Piece {
 
+  /**
+   * A knight piece.
+   *
+   * @param row   The row of the piece.
+   * @param col   The col of the piece.
+   * @param isTop Whether or not the piece belongs to the top or bottom team.
+   */
   public Knight(int row, int col, boolean isTop) {
     super(row, col, isTop);
 

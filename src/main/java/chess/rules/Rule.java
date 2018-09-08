@@ -11,8 +11,11 @@ public interface Rule extends Serializable {
   Rule NO_OVERLAP = new RuleNoOverlap();
   Rule ATTACK_MOVE = new RuleAttackMove();
   Rule NO_CHANGE = new RuleNoChange();
+  Rule KING_CASTLING = new RuleKingCastling();
   Rule EN_PASSANT = new RuleEnPassant();
   Rule PAWN_ATTACK = new RulePawnAttack();
+  Rule PAWN_PROMOTION = new RulePawnPromotion();
+  Rule NO_CHECK = new RuleNoCheck();
 
   boolean isActionAllowed(Board board, Action action);
 

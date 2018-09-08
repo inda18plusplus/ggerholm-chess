@@ -38,27 +38,27 @@ public class RuleEnPassant implements Rule {
       return false;
     }
 
-    Piece p = action.getPiece();
+    Piece piece = action.getPiece();
 
-    if (!(p instanceof Pawn)) {
+    if (!(piece instanceof Pawn)) {
       return false;
     }
 
     int row = action.row();
     int col = action.col();
 
-    Piece target = board.getAt(p.row(), col);
-    if (target == null || target.isTop() == p.isTop() || !(target instanceof Pawn)) {
+    Piece target = board.getAt(piece.row(), col);
+    if (target == null || target.isTop() == piece.isTop() || !(target instanceof Pawn)) {
       return false;
     }
 
-    if (col == p.col() - 1 || col == p.col() + 1) {
-      Action killAction = new Action(p, p.row(), col, Action.Type.Attack);
+    if (col == piece.col() - 1 || col == piece.col() + 1) {
+      Action killAction = new Action(piece, piece.row(), col, Action.Type.Attack);
 
-      if (p.isTop() && row == p.row() + 1) {
+      if (piece.isTop() && row == piece.row() + 1) {
         board.forceKill(killAction);
         return true;
-      } else if (!p.isTop() && row == p.row() - 1) {
+      } else if (!piece.isTop() && row == piece.row() - 1) {
         board.forceKill(killAction);
         return true;
       }

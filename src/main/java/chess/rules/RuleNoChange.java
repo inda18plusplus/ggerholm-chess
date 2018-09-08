@@ -8,8 +8,8 @@ public class RuleNoChange implements Rule {
 
   @Override
   public boolean isActionAllowed(Board board, Action action) {
-    Piece p = action.getPiece();
-    return !(p.row() == action.row() && p.col() == p.col());
+    Piece piece = action.getPiece();
+    return !(piece.row() == action.row() && piece.col() == piece.col());
   }
 
   @Override

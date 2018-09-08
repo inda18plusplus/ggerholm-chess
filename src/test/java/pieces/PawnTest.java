@@ -1,8 +1,10 @@
 package pieces;
 
+import chess.Action;
 import chess.Board;
 import chess.pieces.Pawn;
 import chess.pieces.Piece;
+import chess.pieces.Queen;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -44,7 +46,7 @@ public class PawnTest {
 
   @Test
   public void testEnPassantNormal() {
-    Board b = new Board();
+    Board b = Board.getInstance().getEngine();
     b.setupStandardBoard();
 
     b.forceMove(6, 1, 3, 1);
@@ -57,7 +59,7 @@ public class PawnTest {
 
   @Test
   public void testEnPassantOneSquareOnly() {
-    Board b = new Board();
+    Board b = Board.getInstance().getEngine();
     b.setupStandardBoard();
 
     b.forceMove(6, 1, 3, 1);
@@ -71,7 +73,7 @@ public class PawnTest {
 
   @Test
   public void testEnPassantMultipleActions() {
-    Board b = new Board();
+    Board b = Board.getInstance().getEngine();
     b.setupStandardBoard();
 
     b.forceMove(6, 1, 4, 1);
@@ -86,6 +88,25 @@ public class PawnTest {
 
     Assert.assertTrue(b.selectPieceAt(3, 1));
     Assert.assertFalse(b.moveTo(2, 0));
+  }
+
+  @Test
+  public void testQueenPromotion() {
+    Board b = Board.getInstance().getEngine();
+    b.setupStandardBoard();
+
+    Piece p = b.getAt(1, 0);
+    b.forceKill(new Action(p, 6, 0, Action.Type.Attack));
+    b.forceKill(new Action(p, 7, 0, Action.Type.Attack));
+    b.forceMove(1, 0, 6, 0);
+
+    Assert.assertTrue(b.selectPieceAt(6, 0));
+    Assert.assertTrue(b.moveTo(7, 0));
+    Assert.assertTrue(b.isPromoting());
+    Assert.assertTrue(b.promoteTo(Queen.class));
+
+    Assert.assertEquals(b.getAt(7, 0).getClass(), Queen.class);
+
   }
 
 }

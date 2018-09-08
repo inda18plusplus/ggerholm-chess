@@ -5,13 +5,20 @@ import chess.rules.Rule;
 
 public class Pawn extends Piece {
 
-
+  /**
+   * A pawn piece.
+   *
+   * @param row   The row of the piece.
+   * @param col   The col of the piece.
+   * @param isTop Whether or not the piece belongs to the top or bottom team.
+   */
   public Pawn(int row, int col, boolean isTop) {
     super(row, col, isTop);
 
     rules.remove(Rule.ATTACK_MOVE);
     rules.add(Rule.PAWN_ATTACK);
     rules.add(Rule.EN_PASSANT);
+    rules.add(Rule.PAWN_PROMOTION);
 
   }
 

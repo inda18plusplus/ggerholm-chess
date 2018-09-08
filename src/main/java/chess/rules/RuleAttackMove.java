@@ -13,14 +13,15 @@ public class RuleAttackMove implements Rule {
       return true;
     }
 
-    Piece p = action.getPiece();
+    Piece piece = action.getPiece();
     Piece target = board.getAt(action.row(), action.col());
 
     if (target instanceof King) {
       return false;
     }
 
-    return p.isTop() != target.isTop() && p.getPossibleAttackPositions()[target.row()][target.col()] == 1;
+    return piece.isTop() != target.isTop()
+            && piece.getPossibleAttackPositions()[target.row()][target.col()] == 1;
   }
 
   @Override
