@@ -6,7 +6,7 @@ public final class Utils {
 
   /**
    * Tries to execute the given consumer with the provided value.
-   * The execution is surrounded by try/catch and will capture any potential
+   * The execution is surrounded by a try/catch block and will capture any potential
    * ArrayIndexOutOfBounds exception. The exception will be logged and then ignored.
    *
    * @param consumer The consumer to be executed.

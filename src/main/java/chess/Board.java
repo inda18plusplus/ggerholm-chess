@@ -263,9 +263,9 @@ public final class Board implements BoardInterface {
    *
    * @param row    The row number.
    * @param col    The column number.
-   * @param isTop  Assumes the square has a unit from this team.
+   * @param isTop  Assumes the square has a unit from this team (top if true, bottom if false).
    * @param isPawn A pawn can also be attacked using its special move, unlike other pieces.
-   * @return True if any unit the enemy team could mount an attack towards this square.
+   * @return True if any unit in the enemy team could mount an attack towards this square.
    */
   public boolean isSquareUnderAttack(int row, int col, boolean isTop, boolean isPawn) {
 
@@ -277,7 +277,7 @@ public final class Board implements BoardInterface {
                     Rule.EN_PASSANT.isActionAllowed(this,
                             new Action(
                                     m,
-                                    row + (m.row() < row ? -1 : 1),
+                                    row + (m.row() < row ? 1 : -1),
                                     col,
                                     Action.Type.Move)))) {
       return true;

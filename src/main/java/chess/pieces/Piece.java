@@ -4,12 +4,11 @@ import chess.Action;
 import chess.Board;
 import chess.rules.Rule;
 
-import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Piece implements Serializable {
+public abstract class Piece {
 
   private int row;
   private int col;
@@ -24,7 +23,7 @@ public abstract class Piece implements Serializable {
    * The abstract piece class, inherited by all different pieces of the game.
    *
    * @param row   The row of the piece.
-   * @param col   The col of the piece.
+   * @param col   The column of the piece.
    * @param isTop Whether or not the piece belongs to the top or bottom team.
    */
   Piece(int row, int col, boolean isTop) {
@@ -47,10 +46,24 @@ public abstract class Piece implements Serializable {
     calculatePossiblePositions();
   }
 
+  /**
+   * Returns a two-dimensional array of columns and rows.
+   * A one in the array represents a possible next move.
+   * This does not take into account other units.
+   *
+   * @return An int[][] with the width and height of the board.
+   */
   public int[][] getPossiblePositions() {
     return positions;
   }
 
+  /**
+   * Returns a two-dimensional array of columns and rows.
+   * A one in the array represents a possible next attack.
+   * This does not take into account other units.
+   *
+   * @return An int[][] with the width and height of the board.
+   */
   public int[][] getPossibleAttackPositions() {
     return attackPositions;
   }
@@ -108,14 +121,29 @@ public abstract class Piece implements Serializable {
 
   abstract void calculatePossiblePositions();
 
+  /**
+   * Returns the row of the piece.
+   *
+   * @return An integer in the range 0 - 7.
+   */
   public int row() {
     return row;
   }
 
+  /**
+   * Returns the column of the piece.
+   *
+   * @return An integer in the range 0 - 7.
+   */
   public int col() {
     return col;
   }
 
+  /**
+   * Returns whether or not the piece belongs to the top or bottom team.
+   *
+   * @return True if the piece belongs to the top team, otherwise false.
+   */
   public boolean isTop() {
     return isTop;
   }
