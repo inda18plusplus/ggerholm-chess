@@ -5,8 +5,10 @@ import chess.pieces.Knight;
 import chess.pieces.Pawn;
 import chess.pieces.Queen;
 import chess.pieces.Rook;
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class BoardTest {
 
@@ -15,8 +17,8 @@ public class BoardTest {
     Board b = Board.getInstance().getEngine();
     b.setupStandardBoard();
 
-    Assert.assertFalse(b.isSquareUnderAttack(2, 0, true, false));
-    Assert.assertTrue(b.isSquareUnderAttack(2, 0, false, false));
+    assert !b.isSquareUnderAttack(2, 0, true, false);
+    assert b.isSquareUnderAttack(2, 0, false, false);
 
   }
 
@@ -31,8 +33,8 @@ public class BoardTest {
     b.addPiece(new King(5, 5, false));
     b.addPiece(new Bishop(5, 6, false));
 
-    Assert.assertTrue(b.isKingInCheck(true));
-    Assert.assertFalse(b.isTeamInCheckmate(true));
+    assert b.isKingInCheck(true);
+    assert !(b.isTeamInCheckmate(true));
 
   }
 
@@ -49,8 +51,8 @@ public class BoardTest {
     b.addPiece(new Pawn(6, 5, false));
     b.addPiece(new Pawn(6, 6, false));
 
-    Assert.assertTrue(b.isKingInCheck(false));
-    Assert.assertTrue(b.isTeamInCheckmate(false));
+    assert b.isKingInCheck(false);
+    assert b.isTeamInCheckmate(false);
 
   }
 
@@ -63,7 +65,7 @@ public class BoardTest {
     b.addPiece(new King(2, 5, false));
     b.addPiece(new Queen(2, 7, false));
 
-    Assert.assertTrue(b.isTeamInStalemate(true));
+    assert b.isTeamInStalemate(true);
 
   }
 
@@ -75,8 +77,8 @@ public class BoardTest {
     b.addPiece(new Queen(7, 7, true));
     b.addPiece(new King(7, 6, false));
 
-    Assert.assertTrue(b.selectPieceAt(7, 7));
-    Assert.assertFalse(b.captureAt(7, 6));
+    assertTrue(b.selectPieceAt(7, 7));
+    assertFalse(b.captureAt(7, 6));
 
   }
 

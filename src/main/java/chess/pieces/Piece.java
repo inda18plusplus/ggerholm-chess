@@ -125,14 +125,14 @@ public abstract class Piece {
    */
   public final boolean isAllowed(Board board, Action action) {
     if (rules.stream().anyMatch(m -> m.isSuperior()
-            && m.isActionAllowed(board, action).equals(Rule.Result.Passed))) {
+        && m.isActionAllowed(board, action).equals(Rule.Result.Passed))) {
       return true;
     }
 
     return rules
-            .stream()
-            .filter(m -> !m.isSuperior())
-            .noneMatch(m -> m.isActionAllowed(board, action).equals(Rule.Result.NotPassed));
+        .stream()
+        .filter(m -> !m.isSuperior())
+        .noneMatch(m -> m.isActionAllowed(board, action).equals(Rule.Result.NotPassed));
   }
 
   /**
@@ -146,15 +146,15 @@ public abstract class Piece {
 
     try {
       shallow = this.getClass()
-              .getConstructor(int.class, int.class, boolean.class)
-              .newInstance(position.row(), position.col(), isTop);
+          .getConstructor(int.class, int.class, boolean.class)
+          .newInstance(position.row(), position.col(), isTop);
       shallow.hasMoved = hasMoved;
       shallow.redoPositions();
       return shallow;
     } catch (InstantiationException
-            | IllegalAccessException
-            | InvocationTargetException
-            | NoSuchMethodException ignored) {
+        | IllegalAccessException
+        | InvocationTargetException
+        | NoSuchMethodException ignored) {
       return null;
     }
   }
@@ -166,9 +166,9 @@ public abstract class Piece {
    */
   public String toString() {
     return String.format("%s %d %d",
-            getClass().getSimpleName(),
-            row(),
-            col());
+        getClass().getSimpleName(),
+        row(),
+        col());
   }
 
 }

@@ -7,7 +7,7 @@ import org.junit.Test;
 public class ActionTest {
 
   @Test
-  public void testClone() {
+  public void testShallowCopy() {
 
     Piece original = new Pawn(0, 0, true);
     Action move = new Action(original, 2, 0, Action.Type.Move);

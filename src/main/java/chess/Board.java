@@ -123,21 +123,22 @@ public final class Board implements BoardInterface {
           int bottomChoice = rand.nextInt(bottomTeam.size());
           try {
             Piece top = topTeam.get(topChoice)
-                    .getConstructor(int.class, int.class, boolean.class)
-                    .newInstance(0, i % 8, true);
+                .getConstructor(int.class, int.class, boolean.class)
+                .newInstance(0, i % 8, true);
             Piece bottom = bottomTeam.get(bottomChoice)
-                    .getConstructor(int.class, int.class, boolean.class)
-                    .newInstance(7, i % 8, false);
+                .getConstructor(int.class, int.class, boolean.class)
+                .newInstance(7, i % 8, false);
 
-            topTeam.remove(topChoice);
-            bottomTeam.remove(bottomChoice);
             pieces.add(top);
             pieces.add(bottom);
+            topTeam.remove(topChoice);
+            bottomTeam.remove(bottomChoice);
+
 
           } catch (InstantiationException
-                  | IllegalAccessException
-                  | InvocationTargetException
-                  | NoSuchMethodException ignored) {
+              | IllegalAccessException
+              | InvocationTargetException
+              | NoSuchMethodException ignored) {
             // TODO: Log
           }
           break;
@@ -210,19 +211,19 @@ public final class Board implements BoardInterface {
     Piece p = pieces.get(promotionIndex);
     try {
       Piece promoted = promotion.getConstructor(
-              int.class,
-              int.class,
-              boolean.class)
-              .newInstance(p.row(), p.col(), p.isTop());
+          int.class,
+          int.class,
+          boolean.class)
+          .newInstance(p.row(), p.col(), p.isTop());
 
       pieces.remove(promotionIndex);
       pieces.add(promotionIndex, promoted);
       promotionIndex = -1;
 
     } catch (InstantiationException
-            | IllegalAccessException
-            | InvocationTargetException
-            | NoSuchMethodException ignored) {
+        | IllegalAccessException
+        | InvocationTargetException
+        | NoSuchMethodException ignored) {
       return false;
     }
 
@@ -259,8 +260,8 @@ public final class Board implements BoardInterface {
 
   private Piece getKingOfTeam(boolean isTop) {
     return pieces.stream()
-            .filter(m -> m.isTop() == isTop && m instanceof King)
-            .findFirst().orElse(null);
+        .filter(m -> m.isTop() == isTop && m instanceof King)
+        .findFirst().orElse(null);
   }
 
   @Override
@@ -288,22 +289,22 @@ public final class Board implements BoardInterface {
 
     Set<Square> possibleMoves = king.getPossiblePositions();
     if (possibleMoves
-            .stream()
-            .anyMatch(m -> king.isAllowed(this,
-                    new Action(king, m, Action.Type.Move)))) {
+        .stream()
+        .anyMatch(m -> king.isAllowed(this,
+            new Action(king, m, Action.Type.Move)))) {
       return false;
     }
 
 
     List<Piece> attackers = getEnemyPieces(isTop)
-            .stream()
-            .filter(m -> m.isAllowed(this,
-                    new Action(m, king.row(), king.col(), Action.Type.Attack)))
-            .collect(Collectors.toList());
+        .stream()
+        .filter(m -> m.isAllowed(this,
+            new Action(m, king.row(), king.col(), Action.Type.Attack)))
+        .collect(Collectors.toList());
 
     if (attackers
-            .stream()
-            .allMatch(m -> isSquareUnderAttack(m.row(), m.col(), m.isTop(), m instanceof Pawn))) {
+        .stream()
+        .allMatch(m -> isSquareUnderAttack(m.row(), m.col(), m.isTop(), m instanceof Pawn))) {
       return false;
     }
 
@@ -340,24 +341,24 @@ public final class Board implements BoardInterface {
     }
 
     return getFriendlyPieces(isTop)
-            .stream()
-            .allMatch(m -> getValidPositions(m).isEmpty() && getValidAttacks(m).isEmpty());
+        .stream()
+        .allMatch(m -> getValidPositions(m).isEmpty() && getValidAttacks(m).isEmpty());
   }
 
   private Set<Square> getValidPositions(Piece piece) {
     return piece
-            .getPossiblePositions()
-            .stream()
-            .filter(m -> piece.isAllowed(this, new Action(piece, m, Action.Type.Move)))
-            .collect(Collectors.toSet());
+        .getPossiblePositions()
+        .stream()
+        .filter(m -> piece.isAllowed(this, new Action(piece, m, Action.Type.Move)))
+        .collect(Collectors.toSet());
   }
 
   private Set<Square> getValidAttacks(Piece piece) {
     return piece
-            .getPossibleAttackPositions()
-            .stream()
-            .filter(m -> piece.isAllowed(this, new Action(piece, m, Action.Type.Attack)))
-            .collect(Collectors.toSet());
+        .getPossibleAttackPositions()
+        .stream()
+        .filter(m -> piece.isAllowed(this, new Action(piece, m, Action.Type.Attack)))
+        .collect(Collectors.toSet());
   }
 
   @Override
@@ -406,8 +407,10 @@ public final class Board implements BoardInterface {
     }
 
     Action action = new Action(selected, row, col, Action.Type.Attack);
-    action.insertAct(true, () -> pieces.removeIf(m -> m.isTop() != isTopTurn() && m.isAt(row, col)));
-    action.insertAct(false, () -> selected.moveTo(row, col));
+    action.insertAct(true,
+        () -> pieces.removeIf(m -> m.isTop() != isTopTurn() && m.isAt(row, col)));
+    action.insertAct(false,
+        () -> selected.moveTo(row, col));
 
     if (!selected.isAllowed(this, action)) {
       return false;
@@ -428,22 +431,22 @@ public final class Board implements BoardInterface {
   public boolean isSquareUnderAttack(int row, int col, boolean isTop, boolean isPawn) {
 
     if (isPawn
-            && pieces
-            .stream()
-            .filter(m -> (m instanceof Pawn) && m.isTop() != isTop)
-            .anyMatch(m ->
-                    Rule.EN_PASSANT.isActionAllowed(this,
-                            new Action(
-                                    m,
-                                    row + (m.row() < row ? 1 : -1),
-                                    col,
-                                    Action.Type.Move)).equals(Rule.Result.Passed))) {
+        && pieces
+        .stream()
+        .filter(m -> (m instanceof Pawn) && m.isTop() != isTop)
+        .anyMatch(m ->
+            Rule.EN_PASSANT.isActionAllowed(this,
+                new Action(
+                    m,
+                    row + (m.row() < row ? 1 : -1),
+                    col,
+                    Action.Type.Move)).equals(Rule.Result.Passed))) {
       return true;
     }
 
     return getEnemyPieces(isTop)
-            .stream()
-            .anyMatch(m -> m.isAllowed(this, new Action(m, row, col, Action.Type.Attack)));
+        .stream()
+        .anyMatch(m -> m.isAllowed(this, new Action(m, row, col, Action.Type.Attack)));
   }
 
   /**
@@ -502,9 +505,9 @@ public final class Board implements BoardInterface {
   public Board getShallowCopy() {
     Board shallow = new Board();
     shallow.pieces = new ArrayList<>(pieces)
-            .stream()
-            .map(Piece::getShallowCopy)
-            .collect(Collectors.toList());
+        .stream()
+        .map(Piece::getShallowCopy)
+        .collect(Collectors.toList());
     shallow.history = new ArrayList<>(history);
     shallow.turn = turn;
     shallow.promoteAfterAction = promoteAfterAction;

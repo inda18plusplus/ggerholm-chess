@@ -14,7 +14,7 @@ public class RulePawnAttack implements Rule {
     }
 
     Piece piece = action.getPiece();
-    if(!(piece instanceof Pawn)){
+    if (!(piece instanceof Pawn)) {
       return Result.Invalid;
     }
 

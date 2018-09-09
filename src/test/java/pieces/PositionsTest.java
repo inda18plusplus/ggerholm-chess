@@ -4,12 +4,13 @@ import chess.pieces.King;
 import chess.pieces.Knight;
 import chess.pieces.Pawn;
 import chess.pieces.Piece;
-import chess.pieces.Square;
 import chess.pieces.Queen;
-import org.junit.Assert;
+import chess.pieces.Square;
 import org.junit.Test;
 
 import java.util.Set;
+
+import static org.junit.Assert.assertTrue;
 
 public class PositionsTest {
 
@@ -111,9 +112,9 @@ public class PositionsTest {
         final int r = i;
         final int c = j;
         if (correct[i][j] == 1) {
-          Assert.assertTrue(positions.stream().anyMatch(m -> m.isAt(r, c)));
+          assertTrue(positions.stream().anyMatch(m -> m.isAt(r, c)));
         } else {
-          Assert.assertTrue(positions.stream().noneMatch(m -> m.isAt(r, c)));
+          assertTrue(positions.stream().noneMatch(m -> m.isAt(r, c)));
         }
       }
     }
