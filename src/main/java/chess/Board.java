@@ -5,6 +5,7 @@ import chess.pieces.King;
 import chess.pieces.Knight;
 import chess.pieces.Pawn;
 import chess.pieces.Piece;
+import chess.pieces.Square;
 import chess.pieces.Queen;
 import chess.pieces.Rook;
 import chess.rules.Rule;
@@ -13,6 +14,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public final class Board implements BoardInterface {
 
@@ -96,6 +99,10 @@ public final class Board implements BoardInterface {
     history.clear();
     turn = 0;
     selected = null;
+  }
+
+  public void addPiece(Piece piece) {
+    pieces.add(piece);
   }
 
   private void takeAction(Action action, boolean skipTurn) {
@@ -199,6 +206,83 @@ public final class Board implements BoardInterface {
   }
 
   @Override
+  public boolean isTeamInCheckmate(boolean isTop) {
+    if (!isKingInCheck(isTop)) {
+      return false;
+    }
+
+    Piece king = pieces
+            .stream()
+            .filter(m -> m.isTop() == isTop && (m instanceof King))
+            .findAny()
+            .orElse(null);
+
+    if (king == null) {
+      return false;
+    }
+
+    Set<Square> possibleMoves = king.getPossiblePositions();
+    if (possibleMoves
+            .stream()
+            .anyMatch(m -> king.isAllowed(this,
+                    new Action(king, m, Action.Type.Move)))) {
+      return false;
+    }
+
+    List<Piece> attackers = pieces
+            .stream()
+            .filter(m -> m.isTop() != isTop
+                    && m.isAllowed(this,
+                    new Action(m, king.row(), king.col(), Action.Type.Attack)))
+            .collect(Collectors.toList());
+
+
+    if (attackers
+            .stream()
+            .allMatch(m -> isSquareUnderAttack(m.row(), m.col(), m.isTop(), m instanceof Pawn))) {
+      return false;
+    }
+
+    List<Piece> team = pieces
+            .stream()
+            .filter(m -> m.isTop() == isTop && !(m instanceof King))
+            .collect(Collectors.toList());
+    Board shallow = getShallowCopy();
+
+    for (Piece m : team) {
+      Set<Square> moves = m.getPossiblePositions();
+      for (Square p : moves) {
+        final Board fShallow = shallow;
+
+        Action move = new Action(m, p, Action.Type.Move);
+        move.insertAct(true, () -> fShallow.moveTo(p.row(), p.col()));
+
+        if (!m.isAllowed(shallow, move)) {
+          continue;
+        }
+
+        move.execute();
+        if (!shallow.isKingInCheck(isTop)) {
+          return false;
+        }
+
+        shallow = getShallowCopy();
+      }
+    }
+
+    return true;
+  }
+
+  @Override
+  public boolean isTeamInStalemate(boolean isTop) {
+    return pieces
+            .stream()
+            .filter(m -> m.isTop() == isTop)
+            .allMatch(m -> m.getPossiblePositions().isEmpty()
+                    && m.getPossibleAttackPositions().isEmpty());
+  }
+
+  @Override
   public boolean selectPieceAt(int row, int col) {
     if (isPromoting()) {
       return false;
@@ -226,7 +310,7 @@ public final class Board implements BoardInterface {
 
     Action action = new Action(selected, row, col, Action.Type.Move);
     action.insertAct(true, () -> selected.moveTo(row, col));
-    if (selected.notAllowed(this, action)) {
+    if (!selected.isAllowed(this, action)) {
       return false;
     }
 
@@ -245,12 +329,15 @@ public final class Board implements BoardInterface {
     }
 
     Action action = new Action(selected, row, col, Action.Type.Attack);
-    action.insertAct(true, () -> selected.moveTo(row, col));
-    if (selected.notAllowed(this, action)) {
+    action.insertAct(true, () -> pieces.removeIf(m -> m.isTop() != isTopTurn() && m.isAt(row, col)));
+    action.insertAct(false, () -> selected.moveTo(row, col));
+
+    if (!selected.isAllowed(this, action)) {
       return false;
     }
 
-    if (pieces.removeIf(m -> m.isTop() != isTopTurn() && m.isAt(row, col))) {
+    if (action.execute() >= 2) {
+      action.clearActs();
       takeAction(action, false);
       return true;
     }
@@ -283,7 +370,10 @@ public final class Board implements BoardInterface {
       return true;
     }
 
-    return pieces.stream().anyMatch(m -> m.isTop() != isTop && m.canAttackAt(this, row, col));
+    return pieces
+            .stream()
+            .filter(m -> m.isTop() != isTop)
+            .anyMatch(m -> m.canAttackAt(this, row, col));
   }
 
   /**
@@ -341,7 +431,10 @@ public final class Board implements BoardInterface {
    */
   public Board getShallowCopy() {
     Board shallow = new Board();
-    shallow.pieces = new ArrayList<>(pieces);
+    shallow.pieces = new ArrayList<>(pieces)
+            .stream()
+            .map(Piece::getShallowCopy)
+            .collect(Collectors.toList());
     shallow.history = new ArrayList<>(history);
     shallow.turn = turn;
     shallow.promoteAfterAction = promoteAfterAction;
