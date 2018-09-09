@@ -7,9 +7,13 @@ import chess.pieces.Piece;
 public class RuleNoChange implements Rule {
 
   @Override
-  public boolean isActionAllowed(Board board, Action action) {
+  public Result isActionAllowed(Board board, Action action) {
     Piece piece = action.getPiece();
-    return !(piece.row() == action.row() && piece.col() == action.col());
+    if (!(piece.row() == action.row() && piece.col() == action.col())) {
+      return Result.Passed;
+    }
+
+    return Result.NotPassed;
   }
 
   @Override

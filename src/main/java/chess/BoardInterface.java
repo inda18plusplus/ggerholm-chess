@@ -9,6 +9,9 @@ public interface BoardInterface {
    */
   void setupStandardBoard();
 
+
+  void setupFischerBoard();
+
   /**
    * Setups an empty board.
    */
@@ -41,7 +44,7 @@ public interface BoardInterface {
    * @param col The targeted column.
    * @return True if the attack was successful, otherwise false.
    */
-  boolean killAt(int row, int col);
+  boolean captureAt(int row, int col);
 
   /**
    * Returns whether or not the king is currently threatened.

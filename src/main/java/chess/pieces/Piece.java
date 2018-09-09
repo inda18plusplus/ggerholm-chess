@@ -87,27 +87,6 @@ public abstract class Piece {
     return position.isAt(row, col);
   }
 
-  /**
-   * Returns whether or not this piece can attack the provided square.
-   * This does not include special moves like the Pawn's 'en passant'.
-   * It also does not care if the square is empty or not.
-   *
-   * @param board The current board.
-   * @param row   The targeted row.
-   * @param col   The targeted column.
-   * @return True if an attack could be made to the provided square, otherwise false.
-   */
-  public boolean canAttackAt(Board board, int row, int col) {
-    Action action = new Action(this, row, col, Action.Type.Attack);
-    return possibleAttacks
-            .stream()
-            .anyMatch(m -> m.isAt(row, col))
-            && rules
-            .stream()
-            .filter(m -> !m.isSuperior())
-            .allMatch(m -> m.isActionAllowed(board, action));
-  }
-
   abstract void calculatePossiblePositions();
 
   /**
@@ -145,14 +124,15 @@ public abstract class Piece {
    * @return True if a special action triggered or all conditions for a normal move were passed.
    */
   public final boolean isAllowed(Board board, Action action) {
-    if (rules.stream().anyMatch(m -> m.isSuperior() && m.isActionAllowed(board, action))) {
+    if (rules.stream().anyMatch(m -> m.isSuperior()
+            && m.isActionAllowed(board, action).equals(Rule.Result.Passed))) {
       return true;
     }
 
     return rules
             .stream()
             .filter(m -> !m.isSuperior())
-            .allMatch(m -> m.isActionAllowed(board, action));
+            .noneMatch(m -> m.isActionAllowed(board, action).equals(Rule.Result.NotPassed));
   }
 
   /**
@@ -177,6 +157,18 @@ public abstract class Piece {
             | NoSuchMethodException ignored) {
       return null;
     }
+  }
+
+  /**
+   * Converts the piece into a readable String.
+   *
+   * @return A string in the format "PieceType Row Column".
+   */
+  public String toString() {
+    return String.format("%s %d %d",
+            getClass().getSimpleName(),
+            row(),
+            col());
   }
 
 }

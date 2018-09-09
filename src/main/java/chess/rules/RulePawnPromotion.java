@@ -7,14 +7,14 @@ import chess.pieces.Piece;
 public class RulePawnPromotion implements Rule {
 
   @Override
-  public boolean isActionAllowed(Board board, Action action) {
+  public Result isActionAllowed(Board board, Action action) {
     Piece piece = action.getPiece();
     int row = action.row();
     int col = action.col();
 
     if (action.getType().equals(Action.Type.Move)) {
 
-      if (Rule.MOVEMENT.isActionAllowed(board, action)) {
+      if (Rule.MOVEMENT.isActionAllowed(board, action).equals(Result.Passed)) {
 
         if (piece.isTop() && row == Board.GAME_SIZE - 1
                 || !piece.isTop() && row == 0) {
@@ -22,17 +22,17 @@ public class RulePawnPromotion implements Rule {
           action.insertAct(true, board::promoteAfterAction);
           action.insertAct(true, () -> board.forceMove(piece.row(), piece.col(), row, col));
 
-          return true;
+          return Result.Passed;
         }
 
       }
 
-      return false;
+      return Result.NotPassed;
     }
 
     if (action.getType().equals(Action.Type.Attack)) {
 
-      if (Rule.ATTACK_MOVE.isActionAllowed(board, action)) {
+      if (Rule.ATTACK_MOVE.isActionAllowed(board, action).equals(Result.Passed)) {
 
         if (piece.isTop() && row == Board.GAME_SIZE - 1
                 || !piece.isTop() && row == 0) {
@@ -40,15 +40,15 @@ public class RulePawnPromotion implements Rule {
           action.insertAct(true, board::promoteAfterAction);
           action.insertAct(true, () -> board.forceKill(piece, row, col));
 
-          return true;
+          return Result.Passed;
         }
 
       }
 
-      return false;
+      return Result.NotPassed;
     }
 
-    return false;
+    return Result.NotPassed;
   }
 
   @Override

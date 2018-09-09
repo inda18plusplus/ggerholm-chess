@@ -10,7 +10,7 @@ import java.util.Set;
 public final class RuleNoOverlap implements Rule {
 
   @Override
-  public boolean isActionAllowed(Board board, Action action) {
+  public Result isActionAllowed(Board board, Action action) {
     Piece piece = action.getPiece();
     int row = action.row();
     int col = action.col();
@@ -50,14 +50,14 @@ public final class RuleNoOverlap implements Rule {
         final int fR = r;
         final int fC = c;
         if (positions.stream().anyMatch(m -> m.isAt(fR, fC)) && board.getAt(r, c) != null) {
-          return false;
+          return Result.NotPassed;
         }
 
       }
 
     }
 
-    return true;
+    return Result.Passed;
   }
 
   @Override

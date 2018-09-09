@@ -6,17 +6,21 @@ import chess.Board;
 public class RuleMovement implements Rule {
 
   @Override
-  public boolean isActionAllowed(Board board, Action action) {
+  public Result isActionAllowed(Board board, Action action) {
     if (!action.getType().equals(Action.Type.Move)) {
-      return true;
+      return Result.Invalid;
     }
 
-    return action
+    if (action
             .getPiece()
             .getPossiblePositions()
             .stream()
             .anyMatch(m -> m.isAt(action.row(), action.col())
-                    && board.getAt(action.row(), action.col()) == null);
+                    && board.getAt(action.row(), action.col()) == null)) {
+      return Result.Passed;
+    }
+
+    return Result.NotPassed;
   }
 
   @Override

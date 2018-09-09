@@ -5,15 +5,16 @@ import chess.pieces.King;
 import chess.pieces.Knight;
 import chess.pieces.Pawn;
 import chess.pieces.Piece;
-import chess.pieces.Square;
 import chess.pieces.Queen;
 import chess.pieces.Rook;
+import chess.pieces.Square;
 import chess.rules.Rule;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -30,10 +31,6 @@ public final class Board implements BoardInterface {
   private List<Piece> pieces = new ArrayList<>();
   private List<Action> history = new ArrayList<>();
 
-  public static BoardInterface getInstance() {
-    return instance;
-  }
-
   private Board() {
   }
 
@@ -44,10 +41,7 @@ public final class Board implements BoardInterface {
 
   @Override
   public void setupStandardBoard() {
-    pieces.clear();
-    history.clear();
-    turn = 0;
-    selected = null;
+    setupEmptyBoard();
 
     for (int i = 0; i < GAME_SIZE * 2; i++) {
       switch (i) {
@@ -94,6 +88,65 @@ public final class Board implements BoardInterface {
   }
 
   @Override
+  public void setupFischerBoard() {
+    setupEmptyBoard();
+
+    List<Class<? extends Piece>> topTeam = new ArrayList<>();
+    topTeam.add(King.class);
+    topTeam.add(Queen.class);
+    topTeam.add(Rook.class);
+    topTeam.add(Rook.class);
+    topTeam.add(Bishop.class);
+    topTeam.add(Bishop.class);
+    topTeam.add(Knight.class);
+    topTeam.add(Knight.class);
+
+    List<Class<? extends Piece>> bottomTeam = new ArrayList<>(topTeam);
+
+    Random rand = new Random();
+
+    for (int i = 0; i < GAME_SIZE * 2; i++) {
+      switch (i) {
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+          pieces.add(new Pawn(1, i, true));
+          pieces.add(new Pawn(6, i, false));
+          break;
+        default:
+          int topChoice = rand.nextInt(topTeam.size());
+          int bottomChoice = rand.nextInt(bottomTeam.size());
+          try {
+            Piece top = topTeam.get(topChoice)
+                    .getConstructor(int.class, int.class, boolean.class)
+                    .newInstance(0, i % 8, true);
+            Piece bottom = bottomTeam.get(bottomChoice)
+                    .getConstructor(int.class, int.class, boolean.class)
+                    .newInstance(7, i % 8, false);
+
+            topTeam.remove(topChoice);
+            bottomTeam.remove(bottomChoice);
+            pieces.add(top);
+            pieces.add(bottom);
+
+          } catch (InstantiationException
+                  | IllegalAccessException
+                  | InvocationTargetException
+                  | NoSuchMethodException ignored) {
+            // TODO: Log
+          }
+          break;
+      }
+    }
+
+  }
+
+  @Override
   public void setupEmptyBoard() {
     pieces.clear();
     history.clear();
@@ -105,8 +158,11 @@ public final class Board implements BoardInterface {
     pieces.add(piece);
   }
 
-  private void takeAction(Action action, boolean skipTurn) {
-    action.execute();
+  private boolean takeAction(Action action, boolean skipTurn, int minActsExecuted) {
+    if (action.execute() < minActsExecuted) {
+      return false;
+    }
+
     history.add(action);
 
     if (!skipTurn) {
@@ -121,6 +177,8 @@ public final class Board implements BoardInterface {
         }
       }
     }
+
+    return true;
   }
 
   @Override
@@ -190,13 +248,24 @@ public final class Board implements BoardInterface {
     return turn % 2 == 0;
   }
 
+  private List<Piece> getEnemyPieces(boolean isTop) {
+    return pieces.stream().filter(m -> m.isTop() != isTop).collect(Collectors.toList());
+  }
+
+
+  private List<Piece> getFriendlyPieces(boolean isTop) {
+    return getEnemyPieces(!isTop);
+  }
+
+  private Piece getKingOfTeam(boolean isTop) {
+    return pieces.stream()
+            .filter(m -> m.isTop() == isTop && m instanceof King)
+            .findFirst().orElse(null);
+  }
+
   @Override
   public boolean isKingInCheck(boolean isTop) {
-    Piece king = pieces
-            .stream()
-            .filter(m -> m.isTop() == isTop && (m instanceof King))
-            .findAny()
-            .orElse(null);
+    Piece king = getKingOfTeam(isTop);
 
     if (king == null) {
       return false;
@@ -211,11 +280,7 @@ public final class Board implements BoardInterface {
       return false;
     }
 
-    Piece king = pieces
-            .stream()
-            .filter(m -> m.isTop() == isTop && (m instanceof King))
-            .findAny()
-            .orElse(null);
+    Piece king = getKingOfTeam(isTop);
 
     if (king == null) {
       return false;
@@ -229,13 +294,12 @@ public final class Board implements BoardInterface {
       return false;
     }
 
-    List<Piece> attackers = pieces
+
+    List<Piece> attackers = getEnemyPieces(isTop)
             .stream()
-            .filter(m -> m.isTop() != isTop
-                    && m.isAllowed(this,
+            .filter(m -> m.isAllowed(this,
                     new Action(m, king.row(), king.col(), Action.Type.Attack)))
             .collect(Collectors.toList());
-
 
     if (attackers
             .stream()
@@ -243,19 +307,16 @@ public final class Board implements BoardInterface {
       return false;
     }
 
-    List<Piece> team = pieces
-            .stream()
-            .filter(m -> m.isTop() == isTop && !(m instanceof King))
-            .collect(Collectors.toList());
-    Board shallow = getShallowCopy();
+    List<Piece> team = getFriendlyPieces(isTop);
+    team.removeIf(m -> m instanceof King);
 
     for (Piece m : team) {
       Set<Square> moves = m.getPossiblePositions();
-      for (Square p : moves) {
-        final Board fShallow = shallow;
 
+      for (Square p : moves) {
+        Board shallow = getShallowCopy();
         Action move = new Action(m, p, Action.Type.Move);
-        move.insertAct(true, () -> fShallow.moveTo(p.row(), p.col()));
+        move.insertAct(true, () -> shallow.moveTo(p.row(), p.col()));
 
         if (!m.isAllowed(shallow, move)) {
           continue;
@@ -266,7 +327,6 @@ public final class Board implements BoardInterface {
           return false;
         }
 
-        shallow = getShallowCopy();
       }
     }
 
@@ -275,11 +335,29 @@ public final class Board implements BoardInterface {
 
   @Override
   public boolean isTeamInStalemate(boolean isTop) {
-    return pieces
+    if (isKingInCheck(isTop)) {
+      return false;
+    }
+
+    return getFriendlyPieces(isTop)
             .stream()
-            .filter(m -> m.isTop() == isTop)
-            .allMatch(m -> m.getPossiblePositions().isEmpty()
-                    && m.getPossibleAttackPositions().isEmpty());
+            .allMatch(m -> getValidPositions(m).isEmpty() && getValidAttacks(m).isEmpty());
+  }
+
+  private Set<Square> getValidPositions(Piece piece) {
+    return piece
+            .getPossiblePositions()
+            .stream()
+            .filter(m -> piece.isAllowed(this, new Action(piece, m, Action.Type.Move)))
+            .collect(Collectors.toSet());
+  }
+
+  private Set<Square> getValidAttacks(Piece piece) {
+    return piece
+            .getPossibleAttackPositions()
+            .stream()
+            .filter(m -> piece.isAllowed(this, new Action(piece, m, Action.Type.Attack)))
+            .collect(Collectors.toSet());
   }
 
   @Override
@@ -314,12 +392,11 @@ public final class Board implements BoardInterface {
       return false;
     }
 
-    takeAction(action, false);
-    return true;
+    return takeAction(action, false, 1);
   }
 
   @Override
-  public boolean killAt(int row, int col) {
+  public boolean captureAt(int row, int col) {
     if (isPromoting()) {
       return false;
     }
@@ -336,13 +413,7 @@ public final class Board implements BoardInterface {
       return false;
     }
 
-    if (action.execute() >= 2) {
-      action.clearActs();
-      takeAction(action, false);
-      return true;
-    }
-
-    return false;
+    return takeAction(action, false, 2);
   }
 
   /**
@@ -366,14 +437,13 @@ public final class Board implements BoardInterface {
                                     m,
                                     row + (m.row() < row ? 1 : -1),
                                     col,
-                                    Action.Type.Move)))) {
+                                    Action.Type.Move)).equals(Rule.Result.Passed))) {
       return true;
     }
 
-    return pieces
+    return getEnemyPieces(isTop)
             .stream()
-            .filter(m -> m.isTop() != isTop)
-            .anyMatch(m -> m.canAttackAt(this, row, col));
+            .anyMatch(m -> m.isAllowed(this, new Action(m, row, col, Action.Type.Attack)));
   }
 
   /**
@@ -386,7 +456,7 @@ public final class Board implements BoardInterface {
   public void forceKill(Piece attacker, int row, int col) {
 
     if (pieces.removeIf(m -> m.isAt(row, col))) {
-      takeAction(new Action(attacker, row, col, Action.Type.Attack), true);
+      takeAction(new Action(attacker, row, col, Action.Type.Attack), true, 0);
     }
 
   }
@@ -407,7 +477,7 @@ public final class Board implements BoardInterface {
 
       Action moveAction = new Action(m, toRow, toCol, Action.Type.Move);
       moveAction.insertAct(true, () -> m.moveTo(toRow, toCol));
-      takeAction(moveAction, true);
+      takeAction(moveAction, true, 0);
 
     });
   }
@@ -441,6 +511,10 @@ public final class Board implements BoardInterface {
     shallow.promotionIndex = promotionIndex;
     shallow.selected = selected;
     return shallow;
+  }
+
+  public static BoardInterface getInstance() {
+    return instance;
   }
 
 }

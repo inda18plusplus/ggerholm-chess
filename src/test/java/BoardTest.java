@@ -55,6 +55,19 @@ public class BoardTest {
   }
 
   @Test
+  public void testStalemate() {
+    Board b = Board.getInstance().getEngine();
+    b.setupEmptyBoard();
+
+    b.addPiece(new King(0, 6, true));
+    b.addPiece(new King(2, 5, false));
+    b.addPiece(new Queen(2, 7, false));
+
+    Assert.assertTrue(b.isTeamInStalemate(true));
+
+  }
+
+  @Test
   public void testAttackOnKing() {
     Board b = Board.getInstance().getEngine();
     b.setupEmptyBoard();
@@ -63,7 +76,7 @@ public class BoardTest {
     b.addPiece(new King(7, 6, false));
 
     Assert.assertTrue(b.selectPieceAt(7, 7));
-    Assert.assertFalse(b.killAt(7, 6));
+    Assert.assertFalse(b.captureAt(7, 6));
 
   }
 

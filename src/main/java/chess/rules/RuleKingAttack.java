@@ -8,9 +8,9 @@ import chess.pieces.Piece;
 public class RuleKingAttack implements Rule {
 
   @Override
-  public boolean isActionAllowed(Board board, Action action) {
+  public Result isActionAllowed(Board board, Action action) {
     if (!action.getType().equals(Action.Type.Attack)) {
-      return true;
+      return Result.Invalid;
     }
 
     Piece target = board.getAt(action.row(), action.col());
@@ -18,7 +18,7 @@ public class RuleKingAttack implements Rule {
       action.clearActs();
     }
 
-    return true;
+    return Result.Passed;
   }
 
   @Override

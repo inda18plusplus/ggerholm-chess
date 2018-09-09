@@ -9,32 +9,32 @@ import chess.pieces.Rook;
 public class RuleKingCastling implements Rule {
 
   @Override
-  public boolean isActionAllowed(Board board, Action action) {
+  public Result isActionAllowed(Board board, Action action) {
     Piece piece = action.getPiece();
     Piece target = board.getAt(
             action.row(),
             action.col() < Board.GAME_SIZE / 2 ? 0 : Board.GAME_SIZE - 1);
 
     if (!(piece instanceof King) || !(target instanceof Rook)) {
-      return false;
+      return Result.Invalid;
     }
 
     if (piece.hasMoved() || target.hasMoved() || piece.row() != target.row()) {
-      return false;
+      return Result.NotPassed;
     }
 
     if (Math.abs(action.col() - piece.col()) != 2) {
-      return false;
+      return Result.NotPassed;
     }
 
-    if (!Rule.NO_OVERLAP.isActionAllowed(board, action)) {
-      return false;
+    if (Rule.NO_OVERLAP.isActionAllowed(board, action).equals(Result.NotPassed)) {
+      return Result.NotPassed;
     }
 
     int dir = (int) Math.signum(target.col() - piece.col());
     for (int i = 0; i < 3; i++) {
       if (board.isSquareUnderAttack(piece.row(), piece.col() + i * dir, piece.isTop(), false)) {
-        return false;
+        return Result.NotPassed;
       }
     }
 
@@ -42,7 +42,7 @@ public class RuleKingCastling implements Rule {
             board.forceMove(target.row(), target.col(), action.row(), action.col() - dir)
     );
 
-    return true;
+    return Result.Passed;
   }
 
   @Override

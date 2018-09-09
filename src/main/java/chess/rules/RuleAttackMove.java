@@ -7,19 +7,26 @@ import chess.pieces.Piece;
 public class RuleAttackMove implements Rule {
 
   @Override
-  public boolean isActionAllowed(Board board, Action action) {
+  public Result isActionAllowed(Board board, Action action) {
     if (!action.getType().equals(Action.Type.Attack)) {
-      return true;
+      return Result.Invalid;
     }
 
     Piece piece = action.getPiece();
     Piece target = board.getAt(action.row(), action.col());
+    if (target == null) {
+      return Result.NotPassed;
+    }
 
-    return piece.isTop() != target.isTop()
+    if (piece.isTop() != target.isTop()
             && piece
             .getPossibleAttackPositions()
             .stream()
-            .anyMatch(m -> m.isAt(target.row(), target.col()));
+            .anyMatch(m -> m.isAt(action.row(), action.col()))) {
+      return Result.Passed;
+    }
+
+    return Result.NotPassed;
   }
 
   @Override

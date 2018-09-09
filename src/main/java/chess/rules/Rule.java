@@ -5,6 +5,10 @@ import chess.Board;
 
 public interface Rule {
 
+  enum Result {
+    Passed, NotPassed, Invalid
+  }
+
   Rule MOVEMENT = new RuleMovement();
   Rule NO_OVERLAP = new RuleNoOverlap();
   Rule ATTACK_MOVE = new RuleAttackMove();
@@ -25,7 +29,7 @@ public interface Rule {
    * @param action The action to be executed.
    * @return True if the action passed the rule, otherwise false.
    */
-  boolean isActionAllowed(Board board, Action action);
+  Result isActionAllowed(Board board, Action action);
 
   /**
    * A superior rule is a rule that makes all other rules redundant when passed.

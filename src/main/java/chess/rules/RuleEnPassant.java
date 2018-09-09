@@ -10,38 +10,38 @@ import java.util.List;
 public class RuleEnPassant implements Rule {
 
   @Override
-  public boolean isActionAllowed(Board board, Action action) {
+  public Result isActionAllowed(Board board, Action action) {
     if (!action.getType().equals(Action.Type.Move)) {
-      return false;
+      return Result.Invalid;
     }
 
     List<Action> history = board.getHistory();
     if (history.size() == 0) {
-      return false;
+      return Result.NotPassed;
     }
 
     Action lastAction = history.get(history.size() - 1);
     if (!(lastAction.getPiece() instanceof Pawn)) {
-      return false;
+      return Result.NotPassed;
     }
 
     if (!lastAction.getType().equals(Action.Type.Move)) {
-      return false;
+      return Result.NotPassed;
     }
 
     Piece last = lastAction.getPiece();
     if (last.row() != lastAction.row() + (last.isTop() ? -2 : 2)) {
-      return false;
+      return Result.NotPassed;
     }
 
     if (last.col() != action.col()) {
-      return false;
+      return Result.NotPassed;
     }
 
     Piece piece = action.getPiece();
 
     if (!(piece instanceof Pawn)) {
-      return false;
+      return Result.NotPassed;
     }
 
     int row = action.row();
@@ -49,7 +49,7 @@ public class RuleEnPassant implements Rule {
 
     Piece target = board.getAt(piece.row(), col);
     if (target == null || target.isTop() == piece.isTop() || !(target instanceof Pawn)) {
-      return false;
+      return Result.NotPassed;
     }
 
     if (col == piece.col() - 1 || col == piece.col() + 1) {
@@ -58,12 +58,12 @@ public class RuleEnPassant implements Rule {
               || !piece.isTop() && row == piece.row() - 1) {
 
         action.insertAct(true, () -> board.forceKill(piece, piece.row(), col));
-        return true;
+        return Result.Passed;
       }
 
     }
 
-    return false;
+    return Result.NotPassed;
   }
 
   @Override
