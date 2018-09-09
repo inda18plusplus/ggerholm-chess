@@ -11,14 +11,14 @@ public interface Rule {
 
   Rule MOVEMENT = new RuleMovement();
   Rule NO_OVERLAP = new RuleNoOverlap();
-  Rule ATTACK_MOVE = new RuleAttackMove();
+  Rule ATTACK = new RuleAttack();
   Rule NO_CHANGE = new RuleNoChange();
   Rule KING_CASTLING = new RuleKingCastling();
   Rule EN_PASSANT = new RuleEnPassant();
   Rule PAWN_ATTACK = new RulePawnAttack();
   Rule PAWN_PROMOTION = new RulePawnPromotion();
   Rule NO_CHECK = new RuleNoCheck();
-  Rule KING_ATTACK = new RuleKingAttack();
+  Rule KING_INVULNERABILITY = new RuleKingInvulnerability();
 
   /**
    * Returns whether or not an action is allowed according to the specific rule.

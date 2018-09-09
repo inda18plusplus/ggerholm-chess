@@ -9,7 +9,7 @@ public class Knight extends Piece {
    *
    * @param row   The row of the piece.
    * @param col   The col of the piece.
-   * @param isTop Whether or not the piece belongs to the top or bottom team.
+   * @param isTop Whether the piece belongs to the top or bottom team.
    */
   public Knight(int row, int col, boolean isTop) {
     super(row, col, isTop);

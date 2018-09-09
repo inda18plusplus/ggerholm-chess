@@ -15,8 +15,8 @@ public abstract class Piece {
 
   private Square position;
   private boolean isTop;
+  private boolean hasMoved;
 
-  boolean hasMoved;
   final Set<Square> possiblePositions = new HashSet<>();
   final Set<Square> possibleAttacks = new HashSet<>();
   final List<Rule> rules = new ArrayList<>();
@@ -34,10 +34,10 @@ public abstract class Piece {
 
     rules.add(Rule.MOVEMENT);
     rules.add(Rule.NO_OVERLAP);
-    rules.add(Rule.ATTACK_MOVE);
+    rules.add(Rule.ATTACK);
     rules.add(Rule.NO_CHANGE);
     rules.add(Rule.NO_CHECK);
-    rules.add(Rule.KING_ATTACK);
+    rules.add(Rule.KING_INVULNERABILITY);
 
     redoPositions();
   }

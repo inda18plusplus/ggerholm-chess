@@ -219,6 +219,7 @@ public final class Board implements BoardInterface {
       pieces.remove(promotionIndex);
       pieces.add(promotionIndex, promoted);
       promotionIndex = -1;
+      promoteAfterAction = false;
 
     } catch (InstantiationException
         | IllegalAccessException
@@ -287,6 +288,8 @@ public final class Board implements BoardInterface {
       return false;
     }
 
+    // --- Check king movement ---
+
     Set<Square> possibleMoves = king.getPossiblePositions();
     if (possibleMoves
         .stream()
@@ -295,6 +298,7 @@ public final class Board implements BoardInterface {
       return false;
     }
 
+    // --- Check if the attackers can be captured ---
 
     List<Piece> attackers = getEnemyPieces(isTop)
         .stream()
@@ -307,6 +311,8 @@ public final class Board implements BoardInterface {
         .allMatch(m -> isSquareUnderAttack(m.row(), m.col(), m.isTop(), m instanceof Pawn))) {
       return false;
     }
+
+    // --- Check if any move by any friendly piece would block the attackers ---
 
     List<Piece> team = getFriendlyPieces(isTop);
     team.removeIf(m -> m instanceof King);

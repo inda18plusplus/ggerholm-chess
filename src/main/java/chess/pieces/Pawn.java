@@ -9,12 +9,12 @@ public class Pawn extends Piece {
    *
    * @param row   The row of the piece.
    * @param col   The col of the piece.
-   * @param isTop Whether or not the piece belongs to the top or bottom team.
+   * @param isTop Whether the piece belongs to the top or bottom team.
    */
   public Pawn(int row, int col, boolean isTop) {
     super(row, col, isTop);
 
-    rules.remove(Rule.ATTACK_MOVE);
+    rules.remove(Rule.ATTACK);
     rules.add(Rule.PAWN_ATTACK);
     rules.add(Rule.EN_PASSANT);
     rules.add(Rule.PAWN_PROMOTION);
@@ -25,7 +25,7 @@ public class Pawn extends Piece {
   void calculatePossiblePositions() {
     new Square(row() + (isTop() ? 1 : -1), col(), possiblePositions);
 
-    if (!hasMoved) {
+    if (!hasMoved()) {
       new Square(row() + (isTop() ? 2 : -2), col(), possiblePositions);
     }
 
