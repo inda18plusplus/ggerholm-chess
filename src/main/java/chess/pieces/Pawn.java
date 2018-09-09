@@ -1,6 +1,5 @@
 package chess.pieces;
 
-import chess.Utils;
 import chess.rules.Rule;
 
 public class Pawn extends Piece {
@@ -24,14 +23,14 @@ public class Pawn extends Piece {
 
   @Override
   void calculatePossiblePositions() {
-    Utils.tryPutAt(m -> positions[row() + (isTop() ? 1 : -1)][col()] = 1, 0);
+    new Square(row() + (isTop() ? 1 : -1), col(), possiblePositions);
 
     if (!hasMoved) {
-      Utils.tryPutAt(m -> positions[row() + (isTop() ? 2 : -2)][col()] = 1, 0);
+      new Square(row() + (isTop() ? 2 : -2), col(), possiblePositions);
     }
 
-    Utils.tryPutAt(m -> attackPositions[row() + (isTop() ? 1 : -1)][col() + 1] = 1, 0);
-    Utils.tryPutAt(m -> attackPositions[row() + (isTop() ? 1 : -1)][col() - 1] = 1, 0);
+    new Square(row() + (isTop() ? 1 : -1), col() + 1, possibleAttacks);
+    new Square(row() + (isTop() ? 1 : -1), col() - 1, possibleAttacks);
   }
 
 }

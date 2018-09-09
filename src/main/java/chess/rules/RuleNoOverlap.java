@@ -3,6 +3,9 @@ package chess.rules;
 import chess.Action;
 import chess.Board;
 import chess.pieces.Piece;
+import chess.pieces.Square;
+
+import java.util.Set;
 
 public final class RuleNoOverlap implements Rule {
 
@@ -37,13 +40,21 @@ public final class RuleNoOverlap implements Rule {
       colRange[1] = col;
     }
 
-    int[][] positions = piece.getPossiblePositions();
+    Set<Square> positions = piece.getPossiblePositions();
     for (int r = rowRange[0]; r <= rowRange[1]; r++) {
       for (int c = colRange[0]; c <= colRange[1]; c++) {
-        if (positions[r][c] == 1 && board.getAt(r, c) != null) {
+        if (r == row && c == col) {
+          continue;
+        }
+
+        final int fR = r;
+        final int fC = c;
+        if (positions.stream().anyMatch(m -> m.isAt(fR, fC)) && board.getAt(r, c) != null) {
           return false;
         }
+
       }
+
     }
 
     return true;

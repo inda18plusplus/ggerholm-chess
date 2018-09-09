@@ -11,7 +11,12 @@ public class RuleMovement implements Rule {
       return true;
     }
 
-    return action.getPiece().getPossiblePositions()[action.row()][action.col()] == 1;
+    return action
+            .getPiece()
+            .getPossiblePositions()
+            .stream()
+            .anyMatch(m -> m.isAt(action.row(), action.col())
+                    && board.getAt(action.row(), action.col()) == null);
   }
 
   @Override

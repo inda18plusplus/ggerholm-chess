@@ -1,6 +1,6 @@
 package chess.pieces;
 
-import chess.Utils;
+import chess.Board;
 
 public class Bishop extends Piece {
 
@@ -10,17 +10,16 @@ public class Bishop extends Piece {
 
   @Override
   void calculatePossiblePositions() {
-    for (int i = 0; i < positions.length; i++) {
+    for (int i = 1; i < Board.GAME_SIZE; i++) {
 
-      Utils.tryPutAt(m -> positions[row() + m][col() + m] = 1, i);
-      Utils.tryPutAt(m -> positions[row() + m][col() - m] = 1, i);
-      Utils.tryPutAt(m -> positions[row() - m][col() + m] = 1, i);
-      Utils.tryPutAt(m -> positions[row() - m][col() - m] = 1, i);
+      new Square(row() - i, col() + i, possiblePositions);
+      new Square(row() - i, col() - i, possiblePositions);
+      new Square(row() + i, col() + i, possiblePositions);
+      new Square(row() + i, col() - i, possiblePositions);
 
     }
 
-    positions[row()][col()] = 0;
-    attackPositions = positions;
+    possibleAttacks.addAll(possiblePositions);
   }
 
 }

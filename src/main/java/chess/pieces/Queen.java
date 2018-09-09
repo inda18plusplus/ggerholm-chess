@@ -1,6 +1,6 @@
 package chess.pieces;
 
-import chess.Utils;
+import chess.Board;
 
 public class Queen extends Piece {
 
@@ -11,19 +11,22 @@ public class Queen extends Piece {
 
   @Override
   void calculatePossiblePositions() {
-    for (int i = 0; i < positions.length; i++) {
-      positions[i][col()] = 1;
-      positions[row()][i] = 1;
 
-      Utils.tryPutAt(m -> positions[row() + m][col() + m] = 1, i);
-      Utils.tryPutAt(m -> positions[row() + m][col() - m] = 1, i);
-      Utils.tryPutAt(m -> positions[row() - m][col() + m] = 1, i);
-      Utils.tryPutAt(m -> positions[row() - m][col() - m] = 1, i);
+    for (int i = 0; i < Board.GAME_SIZE; i++) {
+      possiblePositions.add(new Square(i, col()));
+      possiblePositions.add(new Square(row(), i));
+
+      if (i > 0) {
+        new Square(row() - i, col() + i, possiblePositions);
+        new Square(row() - i, col() - i, possiblePositions);
+        new Square(row() + i, col() + i, possiblePositions);
+        new Square(row() + i, col() - i, possiblePositions);
+      }
 
     }
 
-    positions[row()][col()] = 0;
-    attackPositions = positions;
+    possiblePositions.removeIf(m -> m.isAt(row(), col()));
+    possibleAttacks.addAll(possiblePositions);
   }
 
 }

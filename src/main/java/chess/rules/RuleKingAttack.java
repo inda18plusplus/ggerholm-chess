@@ -2,9 +2,10 @@ package chess.rules;
 
 import chess.Action;
 import chess.Board;
+import chess.pieces.King;
 import chess.pieces.Piece;
 
-public class RuleAttackMove implements Rule {
+public class RuleKingAttack implements Rule {
 
   @Override
   public boolean isActionAllowed(Board board, Action action) {
@@ -12,14 +13,12 @@ public class RuleAttackMove implements Rule {
       return true;
     }
 
-    Piece piece = action.getPiece();
     Piece target = board.getAt(action.row(), action.col());
+    if (target instanceof King && target.isTop() != action.getPiece().isTop()) {
+      action.clearActs();
+    }
 
-    return piece.isTop() != target.isTop()
-            && piece
-            .getPossibleAttackPositions()
-            .stream()
-            .anyMatch(m -> m.isAt(target.row(), target.col()));
+    return true;
   }
 
   @Override

@@ -6,17 +6,19 @@ import chess.rules.Rule;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public abstract class Piece {
 
-  private int row;
-  private int col;
+  private Square position;
   private boolean isTop;
 
   boolean hasMoved;
-  int[][] positions;
-  int[][] attackPositions;
+  final Set<Square> possiblePositions = new HashSet<>();
+  final Set<Square> possibleAttacks = new HashSet<>();
   final List<Rule> rules = new ArrayList<>();
 
   /**
@@ -27,8 +29,7 @@ public abstract class Piece {
    * @param isTop Whether the piece belongs to the top or bottom team.
    */
   Piece(int row, int col, boolean isTop) {
-    this.row = row;
-    this.col = col;
+    position = new Square(row, col);
     this.isTop = isTop;
 
     rules.add(Rule.MOVEMENT);
@@ -36,36 +37,23 @@ public abstract class Piece {
     rules.add(Rule.ATTACK_MOVE);
     rules.add(Rule.NO_CHANGE);
     rules.add(Rule.NO_CHECK);
+    rules.add(Rule.KING_ATTACK);
 
     redoPositions();
   }
 
   private void redoPositions() {
-    positions = new int[Board.GAME_SIZE][Board.GAME_SIZE];
-    attackPositions = new int[Board.GAME_SIZE][Board.GAME_SIZE];
+    possiblePositions.clear();
+    possibleAttacks.clear();
     calculatePossiblePositions();
   }
 
-  /**
-   * Returns a two-dimensional array of columns and rows.
-   * A one in the array represents a possible next move.
-   * This does not take into account other units.
-   *
-   * @return An int[][] with the width and height of the board.
-   */
-  public int[][] getPossiblePositions() {
-    return positions;
+  public Set<Square> getPossiblePositions() {
+    return Collections.unmodifiableSet(possiblePositions);
   }
 
-  /**
-   * Returns a two-dimensional array of columns and rows.
-   * A one in the array represents a possible next attack.
-   * This does not take into account other units.
-   *
-   * @return An int[][] with the width and height of the board.
-   */
-  public int[][] getPossibleAttackPositions() {
-    return attackPositions;
+  public Set<Square> getPossibleAttackPositions() {
+    return possibleAttacks;
   }
 
   public boolean hasMoved() {
@@ -80,9 +68,8 @@ public abstract class Piece {
    * @param col The new column.
    */
   public void moveTo(int row, int col) {
-    if (this.row != row || this.col != col) {
-      this.row = row;
-      this.col = col;
+    if (!isAt(row, col)) {
+      position.set(row, col);
       hasMoved = true;
 
       redoPositions();
@@ -97,7 +84,7 @@ public abstract class Piece {
    * @return True or false.
    */
   public boolean isAt(int row, int col) {
-    return this.row == row && this.col == col;
+    return position.isAt(row, col);
   }
 
   /**
@@ -112,7 +99,9 @@ public abstract class Piece {
    */
   public boolean canAttackAt(Board board, int row, int col) {
     Action action = new Action(this, row, col, Action.Type.Attack);
-    return attackPositions[row][col] == 1
+    return possibleAttacks
+            .stream()
+            .anyMatch(m -> m.isAt(row, col))
             && rules
             .stream()
             .filter(m -> !m.isSuperior())
@@ -127,7 +116,7 @@ public abstract class Piece {
    * @return An integer in the range 0 - 7.
    */
   public int row() {
-    return row;
+    return position.row();
   }
 
   /**
@@ -136,7 +125,7 @@ public abstract class Piece {
    * @return An integer in the range 0 - 7.
    */
   public int col() {
-    return col;
+    return position.col();
   }
 
   /**
@@ -150,19 +139,17 @@ public abstract class Piece {
 
   /**
    * Returns whether or not an action is allowed to be executed.
-   * Also implements changes to the board if the action would trigger a special move,
-   * like the pawn's 'en passant'.
    *
    * @param board  The game board.
    * @param action The action to be executed.
    * @return True if a special action triggered or all conditions for a normal move were passed.
    */
-  public final boolean notAllowed(Board board, Action action) {
+  public final boolean isAllowed(Board board, Action action) {
     if (rules.stream().anyMatch(m -> m.isSuperior() && m.isActionAllowed(board, action))) {
-      return false;
+      return true;
     }
 
-    return !rules
+    return rules
             .stream()
             .filter(m -> !m.isSuperior())
             .allMatch(m -> m.isActionAllowed(board, action));
@@ -180,7 +167,9 @@ public abstract class Piece {
     try {
       shallow = this.getClass()
               .getConstructor(int.class, int.class, boolean.class)
-              .newInstance(row, col, isTop);
+              .newInstance(position.row(), position.col(), isTop);
+      shallow.hasMoved = hasMoved;
+      shallow.redoPositions();
       return shallow;
     } catch (InstantiationException
             | IllegalAccessException

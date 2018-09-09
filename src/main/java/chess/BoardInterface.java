@@ -51,6 +51,10 @@ public interface BoardInterface {
    */
   boolean isKingInCheck(boolean isTop);
 
+  boolean isTeamInCheckmate(boolean isTop);
+
+  boolean isTeamInStalemate(boolean isTop);
+
   /**
    * Returns whether or not the game currently requires a promotion of a pawn.
    *

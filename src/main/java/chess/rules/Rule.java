@@ -14,6 +14,7 @@ public interface Rule {
   Rule PAWN_ATTACK = new RulePawnAttack();
   Rule PAWN_PROMOTION = new RulePawnPromotion();
   Rule NO_CHECK = new RuleNoCheck();
+  Rule KING_ATTACK = new RuleKingAttack();
 
   /**
    * Returns whether or not an action is allowed according to the specific rule.

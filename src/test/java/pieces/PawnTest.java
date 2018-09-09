@@ -1,47 +1,12 @@
 package pieces;
 
 import chess.Board;
-import chess.pieces.Pawn;
 import chess.pieces.Piece;
 import chess.pieces.Queen;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class PawnTest {
-
-  @Test
-  public void testPositions() {
-    Piece pawn = new Pawn(1, 1, true);
-
-    int[][] correct = {
-            {0, 0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0},
-            {0, 1, 0, 0, 0, 0, 0, 0},
-            {0, 1, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0},
-    };
-
-    Assert.assertArrayEquals(pawn.getPossiblePositions(), correct);
-
-    int[][] correctAfterMove = {
-            {0, 0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0},
-            {0, 1, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0},
-    };
-
-    pawn.moveTo(3, 1);
-
-    Assert.assertArrayEquals(pawn.getPossiblePositions(), correctAfterMove);
-
-  }
 
   @Test
   public void testEnPassantNormal() {

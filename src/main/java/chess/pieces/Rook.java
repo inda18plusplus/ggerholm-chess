@@ -1,5 +1,7 @@
 package chess.pieces;
 
+import chess.Board;
+
 public class Rook extends Piece {
 
   public Rook(int row, int col, boolean isTop) {
@@ -8,13 +10,13 @@ public class Rook extends Piece {
 
   @Override
   void calculatePossiblePositions() {
-    for (int i = 0; i < positions.length; i++) {
-      positions[i][col()] = 1;
-      positions[row()][i] = 1;
+    for (int i = 0; i < Board.GAME_SIZE; i++) {
+      possiblePositions.add(new Square(i, col()));
+      possiblePositions.add(new Square(row(), i));
     }
 
-    positions[row()][col()] = 0;
-    attackPositions = positions;
+    possiblePositions.removeIf(m -> m.isAt(row(), col()));
+    possibleAttacks.addAll(possiblePositions);
   }
 
 }

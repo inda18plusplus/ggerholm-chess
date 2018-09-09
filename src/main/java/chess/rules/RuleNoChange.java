@@ -9,7 +9,7 @@ public class RuleNoChange implements Rule {
   @Override
   public boolean isActionAllowed(Board board, Action action) {
     Piece piece = action.getPiece();
-    return !(piece.row() == action.row() && piece.col() == piece.col());
+    return !(piece.row() == action.row() && piece.col() == action.col());
   }
 
   @Override

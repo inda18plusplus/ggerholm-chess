@@ -1,6 +1,7 @@
 package chess;
 
 import chess.pieces.Piece;
+import chess.pieces.Square;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,11 +33,18 @@ public final class Action {
     this.type = type;
   }
 
+  public Action(Piece piece, Square target, Type type) {
+    this(piece, target.row(), target.col(), type);
+  }
+
   /**
    * Executes all acts in the action.
+   *
+   * @return Returns the amount of acts executed.
    */
-  void execute() {
+  int execute() {
     acts.forEach(Runnable::run);
+    return acts.size();
   }
 
   /**
@@ -48,6 +56,10 @@ public final class Action {
    */
   public void insertAct(boolean first, Runnable act) {
     acts.add(first ? 0 : acts.size(), act);
+  }
+
+  public void clearActs() {
+    acts.clear();
   }
 
   /**

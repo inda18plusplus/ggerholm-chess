@@ -1,6 +1,5 @@
 package chess.pieces;
 
-import chess.Utils;
 import chess.rules.Rule;
 
 public class King extends Piece {
@@ -23,12 +22,12 @@ public class King extends Piece {
   void calculatePossiblePositions() {
     for (int i = 0; i < 9; i++) {
 
-      Utils.tryPutAt(m -> positions[row() - 1 + m / 3][col() - 1 + m % 3] = 1, i);
+      new Square(row() - 1 + i / 3, col() - 1 + i % 3, possiblePositions);
 
     }
 
-    positions[row()][col()] = 0;
-    attackPositions = positions;
+    possiblePositions.removeIf(m -> m.isAt(row(), col()));
+    possibleAttacks.addAll(possiblePositions);
   }
 
 }
