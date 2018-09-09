@@ -98,7 +98,8 @@ public final class Board implements BoardInterface {
     selected = null;
   }
 
-  private void actionTaken(Action action, boolean skipTurn) {
+  private void takeAction(Action action, boolean skipTurn) {
+    action.execute();
     history.add(action);
 
     if (!skipTurn) {
@@ -113,7 +114,6 @@ public final class Board implements BoardInterface {
         }
       }
     }
-
   }
 
   @Override
@@ -225,12 +225,12 @@ public final class Board implements BoardInterface {
     }
 
     Action action = new Action(selected, row, col, Action.Type.Move);
+    action.insertAct(true, () -> selected.moveTo(row, col));
     if (selected.notAllowed(this, action)) {
       return false;
     }
 
-    selected.moveTo(row, col);
-    actionTaken(action, false);
+    takeAction(action, false);
     return true;
   }
 
@@ -245,13 +245,13 @@ public final class Board implements BoardInterface {
     }
 
     Action action = new Action(selected, row, col, Action.Type.Attack);
+    action.insertAct(true, () -> selected.moveTo(row, col));
     if (selected.notAllowed(this, action)) {
       return false;
     }
 
     if (pieces.removeIf(m -> m.isTop() != isTopTurn() && m.isAt(row, col))) {
-      selected.moveTo(row, col);
-      actionTaken(action, false);
+      takeAction(action, false);
       return true;
     }
 
@@ -287,16 +287,16 @@ public final class Board implements BoardInterface {
   }
 
   /**
-   * Forces the action to be executed and does not increase the turn.
+   * Forces the unit (if any) on the provided square to be removed and does not increase the turn.
    *
-   * @param action The attack action to be executed.
+   * @param attacker The attacker. This piece will only be logged to the history.
+   * @param row      The targeted row.
+   * @param col      The targeted column.
    */
-  public void forceKill(Action action) {
-    int row = action.row();
-    int col = action.col();
+  public void forceKill(Piece attacker, int row, int col) {
 
     if (pieces.removeIf(m -> m.isAt(row, col))) {
-      actionTaken(new Action(action.getPiece(), row, col, Action.Type.Attack), true);
+      takeAction(new Action(attacker, row, col, Action.Type.Attack), true);
     }
 
   }
@@ -316,8 +316,8 @@ public final class Board implements BoardInterface {
       pieces.removeIf(p -> p.isAt(toRow, toCol));
 
       Action moveAction = new Action(m, toRow, toCol, Action.Type.Move);
-      m.moveTo(toRow, toCol);
-      actionTaken(moveAction, true);
+      moveAction.insertAct(true, () -> m.moveTo(toRow, toCol));
+      takeAction(moveAction, true);
 
     });
   }

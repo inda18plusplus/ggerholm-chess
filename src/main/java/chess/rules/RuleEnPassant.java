@@ -53,13 +53,11 @@ public class RuleEnPassant implements Rule {
     }
 
     if (col == piece.col() - 1 || col == piece.col() + 1) {
-      Action killAction = new Action(piece, piece.row(), col, Action.Type.Attack);
 
-      if (piece.isTop() && row == piece.row() + 1) {
-        board.forceKill(killAction);
-        return true;
-      } else if (!piece.isTop() && row == piece.row() - 1) {
-        board.forceKill(killAction);
+      if (piece.isTop() && row == piece.row() + 1
+              || !piece.isTop() && row == piece.row() - 1) {
+
+        action.insertAct(true, () -> board.forceKill(piece, piece.row(), col));
         return true;
       }
 

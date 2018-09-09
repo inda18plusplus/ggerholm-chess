@@ -1,6 +1,5 @@
 package rules;
 
-import chess.Action;
 import chess.Board;
 import chess.pieces.King;
 import chess.pieces.Piece;
@@ -17,10 +16,10 @@ public class KingCastlingTest {
     b.setupStandardBoard();
 
     Piece p = b.getAt(0, 4);
-    b.forceKill(new Action(p, 0, 1, Action.Type.Attack));
-    b.forceKill(new Action(p, 0, 2, Action.Type.Attack));
-    b.forceKill(new Action(p, 0, 3, Action.Type.Attack));
-    b.forceKill(new Action(p, 7, 3, Action.Type.Attack));
+    b.forceKill(p, 0, 1);
+    b.forceKill(p, 0, 2);
+    b.forceKill(p, 0, 3);
+    b.forceKill(p, 7, 3);
 
     Assert.assertTrue(b.selectPieceAt(0, 4));
     Assert.assertTrue(b.moveTo(0, 2));

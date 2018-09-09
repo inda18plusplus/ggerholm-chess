@@ -2,6 +2,9 @@ package chess;
 
 import chess.pieces.Piece;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public final class Action {
 
   public enum Type {
@@ -12,6 +15,7 @@ public final class Action {
   private int row;
   private int col;
   private Type type;
+  private List<Runnable> acts = new ArrayList<>();
 
   /**
    * Creates an action-object to describe a move by one Piece.
@@ -26,6 +30,24 @@ public final class Action {
     this.row = row;
     this.col = col;
     this.type = type;
+  }
+
+  /**
+   * Executes all acts in the action.
+   */
+  void execute() {
+    acts.forEach(Runnable::run);
+  }
+
+  /**
+   * Inserts an act into this action.
+   * All acts are executed in the order they appear in the list.
+   *
+   * @param first Whether to add this act first or last in the list.
+   * @param act   The act itself.
+   */
+  public void insertAct(boolean first, Runnable act) {
+    acts.add(first ? 0 : acts.size(), act);
   }
 
   /**

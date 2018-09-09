@@ -1,6 +1,5 @@
 package pieces;
 
-import chess.Action;
 import chess.Board;
 import chess.pieces.Pawn;
 import chess.pieces.Piece;
@@ -96,8 +95,8 @@ public class PawnTest {
     b.setupStandardBoard();
 
     Piece p = b.getAt(1, 0);
-    b.forceKill(new Action(p, 6, 0, Action.Type.Attack));
-    b.forceKill(new Action(p, 7, 0, Action.Type.Attack));
+    b.forceKill(p, 6, 0);
+    b.forceKill(p, 7, 0);
     b.forceMove(1, 0, 6, 0);
 
     Assert.assertTrue(b.selectPieceAt(6, 0));

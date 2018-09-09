@@ -38,7 +38,9 @@ public class RuleKingCastling implements Rule {
       }
     }
 
-    board.forceMove(target.row(), target.col(), action.row(), action.col() - dir);
+    action.insertAct(true, () ->
+            board.forceMove(target.row(), target.col(), action.row(), action.col() - dir)
+    );
 
     return true;
   }

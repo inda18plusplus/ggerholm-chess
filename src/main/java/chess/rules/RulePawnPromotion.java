@@ -19,8 +19,8 @@ public class RulePawnPromotion implements Rule {
         if (piece.isTop() && row == 7
                 || !piece.isTop() && row == 0) {
 
-          board.forceMove(piece.row(), piece.col(), row, col);
-          board.promoteAfterAction();
+          action.insertAct(true, board::promoteAfterAction);
+          action.insertAct(true, () -> board.forceMove(piece.row(), piece.col(), row, col));
 
           return true;
         }
@@ -37,8 +37,8 @@ public class RulePawnPromotion implements Rule {
         if (piece.isTop() && row == 7
                 || !piece.isTop() && row == 0) {
 
-          board.forceKill(action);
-          board.promoteAfterAction();
+          action.insertAct(true, board::promoteAfterAction);
+          action.insertAct(true, () -> board.forceKill(piece, row, col));
 
           return true;
         }

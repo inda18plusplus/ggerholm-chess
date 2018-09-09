@@ -17,9 +17,8 @@ public interface Rule {
 
   /**
    * Returns whether or not an action is allowed according to the specific rule.
-   * Superior rules that are passed may also alter the board during a call to this method.
-   * If the action is not executed completely after passing a superior rule the board may
-   * have to be reverted.
+   * Superior rules that are passed may also add further acts to the action,
+   * which will be executed along with the original ones.
    *
    * @param board  The current board.
    * @param action The action to be executed.
@@ -29,7 +28,7 @@ public interface Rule {
 
   /**
    * A superior rule is a rule that makes all other rules redundant when passed.
-   * They are usually used when the rule itself implements changes to the board when called upon.
+   * They are usually used when the rule itself adds further acts to the action.
    *
    * @return True or false.
    */

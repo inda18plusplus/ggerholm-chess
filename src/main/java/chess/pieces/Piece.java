@@ -24,7 +24,7 @@ public abstract class Piece {
    *
    * @param row   The row of the piece.
    * @param col   The column of the piece.
-   * @param isTop Whether or not the piece belongs to the top or bottom team.
+   * @param isTop Whether the piece belongs to the top or bottom team.
    */
   Piece(int row, int col, boolean isTop) {
     this.row = row;
@@ -101,11 +101,11 @@ public abstract class Piece {
   }
 
   /**
-   * Returns wether or not this piece can attack the provided square.
+   * Returns whether or not this piece can attack the provided square.
    * This does not include special moves like the Pawn's 'en passant'.
    * It also does not care if the square is empty or not.
    *
-   * @param board The current board
+   * @param board The current board.
    * @param row   The targeted row.
    * @param col   The targeted column.
    * @return True if an attack could be made to the provided square, otherwise false.
@@ -140,7 +140,7 @@ public abstract class Piece {
   }
 
   /**
-   * Returns whether or not the piece belongs to the top or bottom team.
+   * Returns whether the piece belongs to the top or bottom team.
    *
    * @return True if the piece belongs to the top team, otherwise false.
    */
