@@ -1,8 +1,8 @@
 package pieces;
 
-import chess.Board;
-import chess.pieces.Piece;
-import chess.pieces.Queen;
+import chess.engine.Board;
+import chess.engine.pieces.Piece;
+import chess.engine.pieces.Queen;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

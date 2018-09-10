@@ -1,8 +1,8 @@
-package chess.pieces;
+package chess.engine.pieces;
 
-import chess.Action;
-import chess.Board;
-import chess.rules.Rule;
+import chess.engine.Action;
+import chess.engine.Board;
+import chess.engine.rules.Rule;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -88,6 +88,12 @@ public abstract class Piece {
   }
 
   abstract void calculatePossiblePositions();
+
+  public abstract char toChar();
+
+  public Square pos() {
+    return position;
+  }
 
   /**
    * Returns the row of the piece.

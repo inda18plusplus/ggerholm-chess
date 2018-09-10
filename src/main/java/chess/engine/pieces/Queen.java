@@ -1,6 +1,6 @@
-package chess.pieces;
+package chess.engine.pieces;
 
-import chess.Board;
+import chess.engine.Board;
 
 public class Queen extends Piece {
 
@@ -27,6 +27,11 @@ public class Queen extends Piece {
 
     possiblePositions.removeIf(m -> m.isAt(row(), col()));
     possibleAttacks.addAll(possiblePositions);
+  }
+
+  @Override
+  public char toChar() {
+    return isTop() ? 'Q' : 'q';
   }
 
 }

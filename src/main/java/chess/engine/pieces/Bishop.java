@@ -1,6 +1,6 @@
-package chess.pieces;
+package chess.engine.pieces;
 
-import chess.Board;
+import chess.engine.Board;
 
 public class Bishop extends Piece {
 
@@ -20,6 +20,11 @@ public class Bishop extends Piece {
     }
 
     possibleAttacks.addAll(possiblePositions);
+  }
+
+  @Override
+  public char toChar() {
+    return isTop() ? 'B' : 'b';
   }
 
 }

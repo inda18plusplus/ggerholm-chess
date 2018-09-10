@@ -1,8 +1,8 @@
-package chess.rules;
+package chess.engine.rules;
 
-import chess.Action;
-import chess.Board;
-import chess.pieces.Piece;
+import chess.engine.Action;
+import chess.engine.Board;
+import chess.engine.pieces.Piece;
 
 public class RuleNoChange implements Rule {
 

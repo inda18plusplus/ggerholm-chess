@@ -1,6 +1,6 @@
-package chess.pieces;
+package chess.engine.pieces;
 
-import chess.rules.Rule;
+import chess.engine.rules.Rule;
 
 public class Knight extends Piece {
 
@@ -33,4 +33,10 @@ public class Knight extends Piece {
 
     possibleAttacks.addAll(possiblePositions);
   }
+
+  @Override
+  public char toChar() {
+    return isTop() ? 'H' : 'h';
+  }
+
 }

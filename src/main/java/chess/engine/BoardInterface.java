@@ -1,6 +1,6 @@
-package chess;
+package chess.engine;
 
-import chess.pieces.Piece;
+import chess.engine.pieces.Piece;
 
 public interface BoardInterface {
 

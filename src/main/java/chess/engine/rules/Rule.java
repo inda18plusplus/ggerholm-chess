@@ -1,7 +1,7 @@
-package chess.rules;
+package chess.engine.rules;
 
-import chess.Action;
-import chess.Board;
+import chess.engine.Action;
+import chess.engine.Board;
 
 public interface Rule {
 

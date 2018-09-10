@@ -1,11 +1,11 @@
 package pieces;
 
-import chess.pieces.King;
-import chess.pieces.Knight;
-import chess.pieces.Pawn;
-import chess.pieces.Piece;
-import chess.pieces.Queen;
-import chess.pieces.Square;
+import chess.engine.pieces.King;
+import chess.engine.pieces.Knight;
+import chess.engine.pieces.Pawn;
+import chess.engine.pieces.Piece;
+import chess.engine.pieces.Queen;
+import chess.engine.pieces.Square;
 import org.junit.Test;
 
 import java.util.Set;

@@ -1,10 +1,10 @@
-import chess.Board;
-import chess.pieces.Bishop;
-import chess.pieces.King;
-import chess.pieces.Knight;
-import chess.pieces.Pawn;
-import chess.pieces.Queen;
-import chess.pieces.Rook;
+import chess.engine.Board;
+import chess.engine.pieces.Bishop;
+import chess.engine.pieces.King;
+import chess.engine.pieces.Knight;
+import chess.engine.pieces.Pawn;
+import chess.engine.pieces.Queen;
+import chess.engine.pieces.Rook;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;

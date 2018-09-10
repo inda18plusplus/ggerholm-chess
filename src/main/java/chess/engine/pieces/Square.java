@@ -1,6 +1,6 @@
-package chess.pieces;
+package chess.engine.pieces;
 
-import chess.Board;
+import chess.engine.Board;
 
 import java.util.Set;
 

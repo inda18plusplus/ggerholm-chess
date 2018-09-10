@@ -1,17 +1,19 @@
-package chess;
+package chess.engine;
 
-import chess.pieces.Bishop;
-import chess.pieces.King;
-import chess.pieces.Knight;
-import chess.pieces.Pawn;
-import chess.pieces.Piece;
-import chess.pieces.Queen;
-import chess.pieces.Rook;
-import chess.pieces.Square;
-import chess.rules.Rule;
+import chess.DrawablePiece;
+import chess.engine.pieces.Bishop;
+import chess.engine.pieces.King;
+import chess.engine.pieces.Knight;
+import chess.engine.pieces.Pawn;
+import chess.engine.pieces.Piece;
+import chess.engine.pieces.Queen;
+import chess.engine.pieces.Rook;
+import chess.engine.pieces.Square;
+import chess.engine.rules.Rule;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -225,6 +227,7 @@ public final class Board implements BoardInterface {
         | IllegalAccessException
         | InvocationTargetException
         | NoSuchMethodException ignored) {
+      // TODO: Log
       return false;
     }
 
@@ -253,7 +256,6 @@ public final class Board implements BoardInterface {
   private List<Piece> getEnemyPieces(boolean isTop) {
     return pieces.stream().filter(m -> m.isTop() != isTop).collect(Collectors.toList());
   }
-
 
   private List<Piece> getFriendlyPieces(boolean isTop) {
     return getEnemyPieces(!isTop);
@@ -288,22 +290,11 @@ public final class Board implements BoardInterface {
       return false;
     }
 
-    // --- Check king movement ---
-
-    Set<Square> possibleMoves = king.getPossiblePositions();
-    if (possibleMoves
-        .stream()
-        .anyMatch(m -> king.isAllowed(this,
-            new Action(king, m, Action.Type.Move)))) {
-      return false;
-    }
-
     // --- Check if the attackers can be captured ---
 
     List<Piece> attackers = getEnemyPieces(isTop)
         .stream()
-        .filter(m -> m.isAllowed(this,
-            new Action(m, king.row(), king.col(), Action.Type.Attack)))
+        .filter(m -> m.isAllowed(this, new Action(m, king.pos(), Action.Type.Attack)))
         .collect(Collectors.toList());
 
     if (attackers
@@ -313,31 +304,7 @@ public final class Board implements BoardInterface {
     }
 
     // --- Check if any move by any friendly piece would block the attackers ---
-
-    List<Piece> team = getFriendlyPieces(isTop);
-    team.removeIf(m -> m instanceof King);
-
-    for (Piece m : team) {
-      Set<Square> moves = m.getPossiblePositions();
-
-      for (Square p : moves) {
-        Board shallow = getShallowCopy();
-        Action move = new Action(m, p, Action.Type.Move);
-        move.insertAct(true, () -> shallow.moveTo(p.row(), p.col()));
-
-        if (!m.isAllowed(shallow, move)) {
-          continue;
-        }
-
-        move.execute();
-        if (!shallow.isKingInCheck(isTop)) {
-          return false;
-        }
-
-      }
-    }
-
-    return true;
+    return getFriendlyPieces(isTop).stream().allMatch(m -> getValidPositions(m).isEmpty());
   }
 
   @Override
@@ -520,6 +487,18 @@ public final class Board implements BoardInterface {
     shallow.promotionIndex = promotionIndex;
     shallow.selected = selected;
     return shallow;
+  }
+
+  public List<DrawablePiece> getDrawables() {
+    return pieces.stream().map(DrawablePiece::new).collect(Collectors.toList());
+  }
+
+  @Override
+  public String toString() {
+    char[] board = new char[GAME_SIZE * GAME_SIZE];
+    Arrays.fill(board, '.');
+    pieces.forEach(m -> board[m.row() * GAME_SIZE + m.col()] = m.toChar());
+    return new String(board);
   }
 
   public static BoardInterface getInstance() {

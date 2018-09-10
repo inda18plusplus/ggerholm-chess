@@ -1,7 +1,7 @@
-package chess;
+package chess.engine;
 
-import chess.pieces.Piece;
-import chess.pieces.Square;
+import chess.engine.pieces.Piece;
+import chess.engine.pieces.Square;
 
 import java.util.ArrayList;
 import java.util.List;

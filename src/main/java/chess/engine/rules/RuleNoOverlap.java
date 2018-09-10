@@ -1,9 +1,9 @@
-package chess.rules;
+package chess.engine.rules;
 
-import chess.Action;
-import chess.Board;
-import chess.pieces.Piece;
-import chess.pieces.Square;
+import chess.engine.Action;
+import chess.engine.Board;
+import chess.engine.pieces.Piece;
+import chess.engine.pieces.Square;
 
 import java.util.Set;
 

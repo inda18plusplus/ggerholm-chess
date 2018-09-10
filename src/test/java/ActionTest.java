@@ -1,6 +1,6 @@
-import chess.Action;
-import chess.pieces.Pawn;
-import chess.pieces.Piece;
+import chess.engine.Action;
+import chess.engine.pieces.Pawn;
+import chess.engine.pieces.Piece;
 import org.junit.Assert;
 import org.junit.Test;
 

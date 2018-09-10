@@ -1,6 +1,6 @@
-package chess.pieces;
+package chess.engine.pieces;
 
-import chess.rules.Rule;
+import chess.engine.rules.Rule;
 
 public class King extends Piece {
 
@@ -28,6 +28,11 @@ public class King extends Piece {
 
     possiblePositions.removeIf(m -> m.isAt(row(), col()));
     possibleAttacks.addAll(possiblePositions);
+  }
+
+  @Override
+  public char toChar() {
+    return isTop() ? 'K' : 'k';
   }
 
 }

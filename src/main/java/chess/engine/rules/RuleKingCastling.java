@@ -1,10 +1,10 @@
-package chess.rules;
+package chess.engine.rules;
 
-import chess.Action;
-import chess.Board;
-import chess.pieces.King;
-import chess.pieces.Piece;
-import chess.pieces.Rook;
+import chess.engine.Action;
+import chess.engine.Board;
+import chess.engine.pieces.King;
+import chess.engine.pieces.Piece;
+import chess.engine.pieces.Rook;
 
 public class RuleKingCastling implements Rule {
 

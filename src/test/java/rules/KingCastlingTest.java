@@ -1,9 +1,9 @@
 package rules;
 
-import chess.Board;
-import chess.pieces.King;
-import chess.pieces.Piece;
-import chess.pieces.Rook;
+import chess.engine.Board;
+import chess.engine.pieces.King;
+import chess.engine.pieces.Piece;
+import chess.engine.pieces.Rook;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

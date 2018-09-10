@@ -1,6 +1,6 @@
-package chess.pieces;
+package chess.engine.pieces;
 
-import chess.rules.Rule;
+import chess.engine.rules.Rule;
 
 public class Pawn extends Piece {
 
@@ -31,6 +31,11 @@ public class Pawn extends Piece {
 
     new Square(row() + (isTop() ? 1 : -1), col() + 1, possibleAttacks);
     new Square(row() + (isTop() ? 1 : -1), col() - 1, possibleAttacks);
+  }
+
+  @Override
+  public char toChar() {
+    return isTop() ? 'P' : 'p';
   }
 
 }
