@@ -16,7 +16,7 @@ public class RulePawnPromotion implements Rule {
 
       if (Rule.MOVEMENT.isActionAllowed(board, action) == Result.Passed) {
 
-        if (piece.isTop() && row == Board.GAME_SIZE - 1
+        if (piece.isTop() && row == Board.BOARD_LENGTH - 1
             || !piece.isTop() && row == 0) {
 
           action.insertAct(true, board::promoteAfterAction);
@@ -34,7 +34,7 @@ public class RulePawnPromotion implements Rule {
 
       if (Rule.ATTACK.isActionAllowed(board, action) == Result.Passed) {
 
-        if (piece.isTop() && row == Board.GAME_SIZE - 1
+        if (piece.isTop() && row == Board.BOARD_LENGTH - 1
             || !piece.isTop() && row == 0) {
 
           action.insertAct(true, board::promoteAfterAction);

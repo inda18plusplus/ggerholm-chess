@@ -10,7 +10,6 @@ import java.util.List;
 
 public class Game extends JFrame implements Runnable {
 
-  static final int PIECE_SIZE = 80;
 
   private int windowWidth = 720;
   private int windowHeight = 720;
@@ -50,13 +49,15 @@ public class Game extends JFrame implements Runnable {
     g.setColor(Color.WHITE);
     g.fillRect(0, 0, windowWidth, windowHeight);
 
-    int boardSize = PIECE_SIZE * Board.GAME_SIZE;
+    int length = Board.BOARD_LENGTH;
+    int pieceSize = DrawablePiece.SIZE;
+    int boardSize = pieceSize * length;
+
     g.translate((windowWidth - boardSize) / 2, (windowHeight - boardSize) / 2);
 
-    int gs = Board.GAME_SIZE;
-    for (int i = 0; i < gs * gs; i++) {
-      g.setColor(i % 2 == i / gs % 2 ? Color.WHITE : Color.BLACK);
-      g.fillRect(i % gs * PIECE_SIZE, i / gs * PIECE_SIZE, PIECE_SIZE, PIECE_SIZE);
+    for (int i = 0; i < length * length; i++) {
+      g.setColor(i % 2 == i / length % 2 ? Color.WHITE : Color.BLACK);
+      g.fillRect(i % length * pieceSize, i / length * pieceSize, pieceSize, pieceSize);
     }
 
     pieces.forEach(m -> m.draw(g));
@@ -67,8 +68,8 @@ public class Game extends JFrame implements Runnable {
   }
 
   private void buffer() {
-    BufferStrategy bs = getBufferStrategy();
-    if (bs == null) {
+    BufferStrategy bufferStrategy = getBufferStrategy();
+    if (bufferStrategy == null) {
       createBufferStrategy(3);
       return;
     }
@@ -76,7 +77,7 @@ public class Game extends JFrame implements Runnable {
     Graphics2D g2d = null;
     do {
       try {
-        g2d = (Graphics2D) bs.getDrawGraphics();
+        g2d = (Graphics2D) bufferStrategy.getDrawGraphics();
         render(g2d);
       } finally {
 
@@ -85,8 +86,8 @@ public class Game extends JFrame implements Runnable {
         }
 
       }
-      bs.show();
-    } while (bs.contentsLost());
+      bufferStrategy.show();
+    } while (bufferStrategy.contentsLost());
 
   }
 

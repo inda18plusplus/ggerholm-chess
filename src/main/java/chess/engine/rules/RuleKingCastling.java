@@ -13,7 +13,7 @@ public class RuleKingCastling implements Rule {
     Piece piece = action.getPiece();
     Piece target = board.getAt(
             action.row(),
-            action.col() < Board.GAME_SIZE / 2 ? 0 : Board.GAME_SIZE - 1);
+            action.col() < Board.BOARD_LENGTH / 2 ? 0 : Board.BOARD_LENGTH - 1);
 
     if (!(piece instanceof King) || !(target instanceof Rook)) {
       return Result.Invalid;

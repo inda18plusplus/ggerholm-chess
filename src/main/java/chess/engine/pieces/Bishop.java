@@ -10,7 +10,7 @@ public class Bishop extends Piece {
 
   @Override
   void calculatePossiblePositions() {
-    for (int i = 1; i < Board.GAME_SIZE; i++) {
+    for (int i = 1; i < Board.BOARD_LENGTH; i++) {
 
       new Square(row() - i, col() + i, possiblePositions);
       new Square(row() - i, col() - i, possiblePositions);

@@ -8,6 +8,8 @@ import java.awt.Image;
 
 public class DrawablePiece {
 
+  static final int SIZE = 80;
+
   private float drawX;
   private float drawY;
   private Image image;
@@ -20,15 +22,15 @@ public class DrawablePiece {
    */
   public DrawablePiece(Piece piece) {
     this.piece = piece;
-    drawX = piece.col() * Game.PIECE_SIZE;
-    drawY = piece.row() * Game.PIECE_SIZE;
+    drawX = piece.col() * SIZE;
+    drawY = piece.row() * SIZE;
 
     // TODO: Load images
   }
 
   void update(float dt) {
-    float horizontalMove = drawX - piece.col() * Game.PIECE_SIZE;
-    float verticalMove = drawY - piece.row() * Game.PIECE_SIZE;
+    float horizontalMove = drawX - piece.col() * SIZE;
+    float verticalMove = drawY - piece.row() * SIZE;
 
     if (Math.abs(horizontalMove) > 1 || Math.abs(verticalMove) > 1) {
       float dir = (float) Math.atan2(verticalMove, horizontalMove);
@@ -41,13 +43,12 @@ public class DrawablePiece {
 
   void draw(Graphics2D g) {
     if (image == null) {
-      int s = Game.PIECE_SIZE / 2;
       g.setColor(piece.isTop() ? Color.BLUE : Color.RED);
-      g.fillRect((int) drawX + s / 2, (int) drawY + s / 2, s, s);
+      g.fillRect((int) drawX + SIZE / 4, (int) drawY + SIZE / 4, SIZE, SIZE);
       return;
     }
 
-    g.drawImage(image, (int) drawX, (int) drawY, Game.PIECE_SIZE, Game.PIECE_SIZE, null);
+    g.drawImage(image, (int) drawX, (int) drawY, SIZE, SIZE, null);
 
   }
 

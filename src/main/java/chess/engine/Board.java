@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 public final class Board implements BoardInterface {
 
-  public static final int GAME_SIZE = 8;
+  public static final int BOARD_LENGTH = 8;
 
   private static Board instance = new Board();
 
@@ -45,7 +45,7 @@ public final class Board implements BoardInterface {
   public void setupStandardBoard() {
     setupEmptyBoard();
 
-    for (int i = 0; i < GAME_SIZE * 2; i++) {
+    for (int i = 0; i < BOARD_LENGTH * 2; i++) {
       switch (i) {
         case 0:
         case 1:
@@ -107,7 +107,7 @@ public final class Board implements BoardInterface {
 
     Random rand = new Random();
 
-    for (int i = 0; i < GAME_SIZE * 2; i++) {
+    for (int i = 0; i < BOARD_LENGTH * 2; i++) {
       switch (i) {
         case 0:
         case 1:
@@ -495,9 +495,9 @@ public final class Board implements BoardInterface {
 
   @Override
   public String toString() {
-    char[] board = new char[GAME_SIZE * GAME_SIZE];
+    char[] board = new char[BOARD_LENGTH * BOARD_LENGTH];
     Arrays.fill(board, '.');
-    pieces.forEach(m -> board[m.row() * GAME_SIZE + m.col()] = m.toChar());
+    pieces.forEach(m -> board[m.row() * BOARD_LENGTH + m.col()] = m.toChar());
     return new String(board);
   }
 

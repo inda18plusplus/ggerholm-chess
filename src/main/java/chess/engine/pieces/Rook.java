@@ -10,7 +10,7 @@ public class Rook extends Piece {
 
   @Override
   void calculatePossiblePositions() {
-    for (int i = 0; i < Board.GAME_SIZE; i++) {
+    for (int i = 0; i < Board.BOARD_LENGTH; i++) {
       possiblePositions.add(new Square(i, col()));
       possiblePositions.add(new Square(row(), i));
     }

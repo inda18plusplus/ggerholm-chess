@@ -31,7 +31,7 @@ public class Square {
   public Square(int row, int col, Set<Square> set) {
     this(row, col);
 
-    if (row >= 0 && row < Board.GAME_SIZE && col >= 0 && col < Board.GAME_SIZE) {
+    if (row >= 0 && row < Board.BOARD_LENGTH && col >= 0 && col < Board.BOARD_LENGTH) {
       set.add(this);
     }
   }
