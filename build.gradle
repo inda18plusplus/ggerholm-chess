@@ -7,6 +7,17 @@ version '1.0'
 sourceCompatibility = JavaVersion.VERSION_1_10
 targetCompatibility = JavaVersion.VERSION_1_10
 
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'Chess',
+                'Implementation-Version': version,
+                'Main-Class': 'chess.Game'
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
 repositories {
     mavenCentral()
 }
