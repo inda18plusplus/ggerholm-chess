@@ -157,114 +157,43 @@ public final class Board implements BoardInterface {
     selected = null;
   }
 
-  public void addPiece(Piece piece) {
-    pieces.add(piece);
-  }
-
-  private boolean takeAction(Action action, boolean skipTurn, int minActsExecuted) {
-    if (action.execute() < minActsExecuted) {
-      return false;
-    }
-
-    history.add(action);
-
-    if (!skipTurn) {
-      turn++;
-    }
-
-    if (promoteAfterAction) {
-      for (int i = 0; i < pieces.size(); i++) {
-        if (pieces.get(i).isAt(action.row(), action.col())) {
-          promotionIndex = i;
-          break;
-        }
-      }
-    }
-
-    return true;
-  }
-
   @Override
-  public int getTurn() {
-    return turn;
-  }
-
-  /**
-   * Makes it so that the next action done must be a promotion of a Pawn.
-   */
-  public void promoteAfterAction() {
+  public boolean selectPieceAt(int row, int col) {
     if (isPromoting()) {
-      return;
-    }
-
-    promoteAfterAction = true;
-  }
-
-  @Override
-  public boolean promoteTo(Class<? extends Piece> promotion) {
-    if (!isPromoting()) {
       return false;
     }
 
-    if (promotion.equals(Pawn.class)) {
+    clearSelected();
+    selected = getAt(row, col);
+
+    if (selected != null && (isTopTurn() != selected.isTop())) {
+      selected = null;
       return false;
     }
 
-    Piece p = pieces.get(promotionIndex);
-    try {
-      Piece promoted = promotion.getConstructor(
-          int.class,
-          int.class,
-          boolean.class)
-          .newInstance(p.row(), p.col(), p.isTop());
+    if (selected != null) {
+      selected.setState(Piece.State.Selected);
+      return true;
+    }
 
-      pieces.remove(promotionIndex);
-      pieces.add(promotionIndex, promoted);
-      promotionIndex = -1;
-      promoteAfterAction = false;
+    return false;
+  }
 
-    } catch (InstantiationException
-        | IllegalAccessException
-        | InvocationTargetException
-        | NoSuchMethodException ignored) {
-      // TODO: Log
+  @Override
+  public boolean goTo(int row, int col) {
+    if (isPromoting()) {
       return false;
     }
 
-    return true;
-  }
+    if (selected == null) {
+      return false;
+    }
 
-  @Override
-  public boolean isPromoting() {
-    return promotionIndex >= 0;
-  }
-
-  /**
-   * Returns all previously executed actions.
-   *
-   * @return An unmodifiable list of Action-objects.
-   */
-  public List<Action> getHistory() {
-    return Collections.unmodifiableList(history);
-  }
-
-  @Override
-  public boolean isTopTurn() {
-    return turn % 2 == 0;
-  }
-
-  private List<Piece> getEnemyPieces(boolean isTop) {
-    return pieces.stream().filter(m -> m.isTop() != isTop).collect(Collectors.toList());
-  }
-
-  private List<Piece> getFriendlyPieces(boolean isTop) {
-    return getEnemyPieces(!isTop);
-  }
-
-  private Piece getKingOfTeam(boolean isTop) {
-    return pieces.stream()
-        .filter(m -> m.isTop() == isTop && m instanceof King)
-        .findFirst().orElse(null);
+    if (getAt(row, col) == null) {
+      return moveTo(row, col);
+    } else {
+      return captureAt(row, col);
+    }
   }
 
   @Override
@@ -318,40 +247,139 @@ public final class Board implements BoardInterface {
         .allMatch(m -> getValidPositions(m).isEmpty() && getValidAttacks(m).isEmpty());
   }
 
-  private Set<Square> getValidPositions(Piece piece) {
-    return piece
-        .getPossiblePositions()
-        .stream()
-        .filter(m -> piece.isAllowed(this, new Action(piece, m, Action.Type.Move)))
-        .collect(Collectors.toSet());
-  }
+  @Override
+  public State getGameState() {
+    if (isKingInCheck(isTopTurn())) {
+      if (isTeamInCheckmate(isTopTurn())) {
+        return State.Checkmate;
+      } else {
+        return State.Check;
+      }
+    } else if (isTeamInStalemate(isTopTurn())) {
+      return State.Stalemate;
+    }
 
-  private Set<Square> getValidAttacks(Piece piece) {
-    return piece
-        .getPossibleAttackPositions()
-        .stream()
-        .filter(m -> piece.isAllowed(this, new Action(piece, m, Action.Type.Attack)))
-        .collect(Collectors.toSet());
+    return State.Normal;
   }
 
   @Override
-  public boolean selectPieceAt(int row, int col) {
+  public boolean isPromoting() {
+    return promotionIndex >= 0;
+  }
+
+  @Override
+  public boolean promoteTo(Promotion promotion) {
+    if (!isPromoting()) {
+      return false;
+    }
+
+    Piece piece = pieces.get(promotionIndex);
+    try {
+      Piece promoted = promotion.type.getConstructor(
+          int.class,
+          int.class,
+          boolean.class)
+          .newInstance(piece.row(), piece.col(), piece.isTop());
+
+      pieces.remove(promotionIndex);
+      pieces.add(promotionIndex, promoted);
+      promotionIndex = -1;
+      promoteAfterAction = false;
+
+    } catch (InstantiationException
+        | IllegalAccessException
+        | InvocationTargetException
+        | NoSuchMethodException ignored) {
+      // TODO: Log
+      return false;
+    }
+
+    piece.setState(Piece.State.Promoted);
+
+    return true;
+  }
+
+  @Override
+  public boolean isTopTurn() {
+    return turn % 2 == 0;
+  }
+
+  @Override
+  public int getTurn() {
+    return turn;
+  }
+
+  /**
+   * Makes it so that the next action done must be a promotion of a Pawn.
+   */
+  public void promoteAfterAction() {
     if (isPromoting()) {
-      return false;
+      return;
     }
 
-    selected = getAt(row, col);
+    promoteAfterAction = true;
+  }
 
-    if (selected != null && (isTopTurn() != selected.isTop())) {
-      selected = null;
+  public void addPiece(Piece piece) {
+    pieces.add(piece);
+  }
+
+  /**
+   * Forces the unit (if any) on the provided square to be removed and does not increase the turn.
+   *
+   * @param attacker The attacker. This piece will only be logged to the history.
+   * @param row      The targeted row.
+   * @param col      The targeted column.
+   */
+  public void forceKill(Piece attacker, int row, int col) {
+
+    if (pieces.removeIf(m -> {
+      if (m.isAt(row, col)) {
+        m.setState(Piece.State.Captured);
+        return true;
+      }
       return false;
+    })) {
+      takeAction(new Action(attacker, row, col, Action.Type.Attack), true, 0);
     }
 
+  }
+
+  /**
+   * Forces the unit (if any) on the provided square to be moved and does not increase the turn.
+   * Also removes any unit on the targeted square.
+   *
+   * @param fromRow The original row.
+   * @param fromCol The original column.
+   * @param toRow   The new row.
+   * @param toCol   The new column.
+   */
+  public void forceMove(int fromRow, int fromCol, int toRow, int toCol) {
+    pieces.stream().filter(m -> m.isAt(fromRow, fromCol)).findAny().ifPresent(m -> {
+
+      pieces.removeIf(p -> p.isAt(toRow, toCol));
+
+      Action moveAction = new Action(m, toRow, toCol, Action.Type.Move);
+      moveAction.insertAct(true, () -> m.moveTo(toRow, toCol));
+      takeAction(moveAction, true, 0);
+
+    });
+  }
+
+  private void clearSelected() {
+    if (selected == null) {
+      return;
+    }
+
+    selected.setState(Piece.State.Alive);
+    selected = null;
+  }
+
+  public boolean hasSelected() {
     return selected != null;
   }
 
-  @Override
-  public boolean moveTo(int row, int col) {
+  private boolean moveTo(int row, int col) {
     if (isPromoting()) {
       return false;
     }
@@ -366,11 +394,15 @@ public final class Board implements BoardInterface {
       return false;
     }
 
-    return takeAction(action, false, 1);
+    if (takeAction(action, false, 1)) {
+      clearSelected();
+      return true;
+    }
+
+    return false;
   }
 
-  @Override
-  public boolean captureAt(int row, int col) {
+  private boolean captureAt(int row, int col) {
     if (isPromoting()) {
       return false;
     }
@@ -381,7 +413,14 @@ public final class Board implements BoardInterface {
 
     Action action = new Action(selected, row, col, Action.Type.Attack);
     action.insertAct(true,
-        () -> pieces.removeIf(m -> m.isTop() != isTopTurn() && m.isAt(row, col)));
+        () -> pieces.removeIf(m -> {
+          if (m.isTop() != isTopTurn() && m.isAt(row, col)) {
+            m.setState(Piece.State.Captured);
+            return true;
+          }
+
+          return false;
+        }));
     action.insertAct(false,
         () -> selected.moveTo(row, col));
 
@@ -389,7 +428,12 @@ public final class Board implements BoardInterface {
       return false;
     }
 
-    return takeAction(action, false, 2);
+    if (takeAction(action, false, 2)) {
+      clearSelected();
+      return true;
+    }
+
+    return false;
   }
 
   /**
@@ -422,40 +466,64 @@ public final class Board implements BoardInterface {
         .anyMatch(m -> m.isAllowed(this, new Action(m, row, col, Action.Type.Attack)));
   }
 
-  /**
-   * Forces the unit (if any) on the provided square to be removed and does not increase the turn.
-   *
-   * @param attacker The attacker. This piece will only be logged to the history.
-   * @param row      The targeted row.
-   * @param col      The targeted column.
-   */
-  public void forceKill(Piece attacker, int row, int col) {
-
-    if (pieces.removeIf(m -> m.isAt(row, col))) {
-      takeAction(new Action(attacker, row, col, Action.Type.Attack), true, 0);
+  private boolean takeAction(Action action, boolean skipTurn, int minActsExecuted) {
+    if (action.execute() < minActsExecuted) {
+      return false;
     }
 
+    history.add(action);
+
+    if (!skipTurn) {
+      turn++;
+    }
+
+    if (promoteAfterAction) {
+      for (int i = 0; i < pieces.size(); i++) {
+        if (pieces.get(i).isAt(action.row(), action.col())) {
+          promotionIndex = i;
+          break;
+        }
+      }
+    }
+
+    return true;
+  }
+
+  public List<DrawablePiece> getDrawables() {
+    return pieces.stream().map(DrawablePiece::new).collect(Collectors.toList());
   }
 
   /**
-   * Forces the unit (if any) on the provided square to be moved and does not increase the turn.
-   * Also removes any unit on the targeted square.
+   * Returns all previously executed actions.
    *
-   * @param fromRow The original row.
-   * @param fromCol The original column.
-   * @param toRow   The new row.
-   * @param toCol   The new column.
+   * @return An unmodifiable list of Action-objects.
    */
-  public void forceMove(int fromRow, int fromCol, int toRow, int toCol) {
-    pieces.stream().filter(m -> m.isAt(fromRow, fromCol)).findAny().ifPresent(m -> {
+  public List<Action> getHistory() {
+    return Collections.unmodifiableList(history);
+  }
 
-      pieces.removeIf(p -> p.isAt(toRow, toCol));
+  private List<Piece> getEnemyPieces(boolean isTop) {
+    return pieces.stream().filter(m -> m.isTop() != isTop).collect(Collectors.toList());
+  }
 
-      Action moveAction = new Action(m, toRow, toCol, Action.Type.Move);
-      moveAction.insertAct(true, () -> m.moveTo(toRow, toCol));
-      takeAction(moveAction, true, 0);
+  private List<Piece> getFriendlyPieces(boolean isTop) {
+    return getEnemyPieces(!isTop);
+  }
 
-    });
+  private Set<Square> getValidPositions(Piece piece) {
+    return piece
+        .getPossiblePositions()
+        .stream()
+        .filter(m -> piece.isAllowed(this, new Action(piece, m, Action.Type.Move)))
+        .collect(Collectors.toSet());
+  }
+
+  private Set<Square> getValidAttacks(Piece piece) {
+    return piece
+        .getPossibleAttackPositions()
+        .stream()
+        .filter(m -> piece.isAllowed(this, new Action(piece, m, Action.Type.Attack)))
+        .collect(Collectors.toSet());
   }
 
   /**
@@ -467,6 +535,12 @@ public final class Board implements BoardInterface {
    */
   public Piece getAt(int row, int col) {
     return pieces.stream().filter(m -> m.isAt(row, col)).findAny().orElse(null);
+  }
+
+  private Piece getKingOfTeam(boolean isTop) {
+    return pieces.stream()
+        .filter(m -> m.isTop() == isTop && m instanceof King)
+        .findFirst().orElse(null);
   }
 
   /**
@@ -487,10 +561,6 @@ public final class Board implements BoardInterface {
     shallow.promotionIndex = promotionIndex;
     shallow.selected = selected;
     return shallow;
-  }
-
-  public List<DrawablePiece> getDrawables() {
-    return pieces.stream().map(DrawablePiece::new).collect(Collectors.toList());
   }
 
   @Override

@@ -1,6 +1,7 @@
 package pieces;
 
 import chess.engine.Board;
+import chess.engine.BoardInterface;
 import chess.engine.pieces.Piece;
 import chess.engine.pieces.Queen;
 import org.junit.Test;
@@ -16,10 +17,10 @@ public class PawnTest {
 
     b.forceMove(6, 1, 3, 1);
     assertTrue(b.selectPieceAt(1, 0)); // Select piece test
-    assertTrue(b.moveTo(3, 0)); // 2 steps forward test
+    assertTrue(b.goTo(3, 0)); // 2 steps forward test
 
     assertTrue(b.selectPieceAt(3, 1)); // Select opponent piece test
-    assertTrue(b.moveTo(2, 0)); // En Passant test
+    assertTrue(b.goTo(2, 0)); // En Passant test
   }
 
   @Test
@@ -30,10 +31,10 @@ public class PawnTest {
     b.forceMove(6, 1, 3, 1);
     b.forceMove(1, 0, 2, 0);
     assertTrue(b.selectPieceAt(2, 0));
-    assertTrue(b.moveTo(3, 0));
+    assertTrue(b.goTo(3, 0));
 
     assertTrue(b.selectPieceAt(3, 1));
-    assertFalse(b.moveTo(2, 0));
+    assertFalse(b.goTo(2, 0));
   }
 
   @Test
@@ -43,16 +44,16 @@ public class PawnTest {
 
     b.forceMove(6, 1, 4, 1);
     assertTrue(b.selectPieceAt(1, 0));
-    assertTrue(b.moveTo(3, 0));
+    assertTrue(b.goTo(3, 0));
 
     assertTrue(b.selectPieceAt(4, 1));
-    assertTrue(b.moveTo(3, 1));
+    assertTrue(b.goTo(3, 1));
 
     assertTrue(b.selectPieceAt(1, 5));
-    assertTrue(b.moveTo(3, 5));
+    assertTrue(b.goTo(3, 5));
 
     assertTrue(b.selectPieceAt(3, 1));
-    assertFalse(b.moveTo(2, 0));
+    assertFalse(b.goTo(2, 0));
   }
 
   @Test
@@ -66,9 +67,9 @@ public class PawnTest {
     b.forceMove(1, 0, 6, 0);
 
     assertTrue(b.selectPieceAt(6, 0));
-    assertTrue(b.moveTo(7, 0));
+    assertTrue(b.goTo(7, 0));
     assertTrue(b.isPromoting());
-    assertTrue(b.promoteTo(Queen.class));
+    assertTrue(b.promoteTo(BoardInterface.Promotion.Queen));
 
     assertEquals(b.getAt(7, 0).getClass(), Queen.class);
 

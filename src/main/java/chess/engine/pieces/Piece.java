@@ -13,6 +13,11 @@ import java.util.Set;
 
 public abstract class Piece {
 
+  public enum State {
+    Selected, Captured, Alive, Promoted
+  }
+
+  private State state;
   private Square position;
   private boolean isTop;
   private boolean hasMoved;
@@ -29,8 +34,9 @@ public abstract class Piece {
    * @param isTop Whether the piece belongs to the top or bottom team.
    */
   Piece(int row, int col, boolean isTop) {
-    position = new Square(row, col);
     this.isTop = isTop;
+    position = new Square(row, col);
+    state = State.Alive;
 
     rules.add(Rule.MOVEMENT);
     rules.add(Rule.NO_OVERLAP);
@@ -54,6 +60,14 @@ public abstract class Piece {
 
   public Set<Square> getPossibleAttackPositions() {
     return possibleAttacks;
+  }
+
+  public void setState(State state) {
+    this.state = state;
+  }
+
+  public State getState() {
+    return state;
   }
 
   public boolean hasMoved() {

@@ -1,15 +1,40 @@
 package chess.engine;
 
+import chess.engine.pieces.Bishop;
+import chess.engine.pieces.Knight;
 import chess.engine.pieces.Piece;
+import chess.engine.pieces.Queen;
+import chess.engine.pieces.Rook;
 
 public interface BoardInterface {
+
+  enum Promotion {
+    Queen(Queen.class),
+    Bishop(Bishop.class),
+    Rook(Rook.class),
+    Knight(Knight.class);
+
+    Class<? extends Piece> type;
+
+    Promotion(Class<? extends Piece> type) {
+      this.type = type;
+    }
+
+  }
+
+  enum State {
+    Check, Checkmate, Stalemate, Normal
+  }
 
   /**
    * Setups a standard board with 16 pieces in each team.
    */
   void setupStandardBoard();
 
-
+  /**
+   * Setups a standard board but with the pieces
+   * on the first ranks of each team shuffled.
+   */
   void setupFischerBoard();
 
   /**
@@ -28,23 +53,14 @@ public interface BoardInterface {
   boolean selectPieceAt(int row, int col);
 
   /**
-   * Attempts to move the currently selected piece to the provided square.
-   * The movement must be accepted by all game rules before it can be made.
+   * Attempts to move the selected unit to the provided square.
+   * If the square is currently occupied, an attack is attempted.
    *
    * @param row The targeted row.
    * @param col The targeted column.
-   * @return True if the movement was successful, otherwise false.
+   * @return True if the move was successful, otherwise false.
    */
-  boolean moveTo(int row, int col);
-
-  /**
-   * Attempts to attack an enemy piece with the currently selected piece.
-   *
-   * @param row The targeted row.
-   * @param col The targeted column.
-   * @return True if the attack was successful, otherwise false.
-   */
-  boolean captureAt(int row, int col);
+  boolean goTo(int row, int col);
 
   /**
    * Returns whether or not the king is currently threatened.
@@ -54,9 +70,30 @@ public interface BoardInterface {
    */
   boolean isKingInCheck(boolean isTop);
 
+  /**
+   * Returns whether or not the king is currently threatened
+   * and there's no way to remove the threat.
+   *
+   * @param isTop Whether to check the top or bottom king.
+   * @return True or false.
+   */
   boolean isTeamInCheckmate(boolean isTop);
 
+  /**
+   * Returns whether or not the team has any possible moves.
+   *
+   * @param isTop Whether to check the top or bottom team.
+   * @return True if there's at least one possible move that can be done, otherwise false.
+   */
   boolean isTeamInStalemate(boolean isTop);
+
+  /**
+   * Returns the state of the game.
+   * Either Check, Checkmate, Stalemate or Normal.
+   *
+   * @return A BoardInterface.State object.
+   */
+  State getGameState();
 
   /**
    * Returns whether or not the game currently requires a promotion of a pawn.
@@ -73,7 +110,7 @@ public interface BoardInterface {
    * @param promotion The class of whatever piece the pawn should be promoted to.
    * @return True if the promotion was successful, otherwise false.
    */
-  boolean promoteTo(Class<? extends Piece> promotion);
+  boolean promoteTo(Promotion promotion);
 
   /**
    * Returns whether or not it is currently the top team's turn to make a move.

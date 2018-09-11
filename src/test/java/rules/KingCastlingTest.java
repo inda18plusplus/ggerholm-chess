@@ -23,7 +23,7 @@ public class KingCastlingTest {
     b.forceKill(p, 7, 3);
 
     assertTrue(b.selectPieceAt(0, 4));
-    assertTrue(b.moveTo(0, 2));
+    assertTrue(b.goTo(0, 2));
 
     assertEquals(b.getAt(0, 2).getClass(), King.class);
     assertEquals(b.getAt(0, 3).getClass(), Rook.class);

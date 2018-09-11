@@ -5,14 +5,19 @@ import chess.engine.Board;
 import javax.swing.JFrame;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferStrategy;
 import java.util.List;
 
 public class Game extends JFrame implements Runnable {
 
-
-  private int windowWidth = 720;
+  static int SQUARE_SIZE = 80;
+  private int windowWidth = 960;
   private int windowHeight = 720;
+
+  private int marginX;
+  private int marginY;
 
   private Board board;
   private List<DrawablePiece> pieces;
@@ -27,6 +32,8 @@ public class Game extends JFrame implements Runnable {
     board.setupStandardBoard();
     pieces = board.getDrawables();
 
+    setupInput();
+
     Thread thread = new Thread(this);
     thread.start();
   }
@@ -39,30 +46,64 @@ public class Game extends JFrame implements Runnable {
     setVisible(true);
   }
 
+  private void setupInput() {
+    addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseClicked(MouseEvent e) {
+        super.mouseClicked(e);
+
+        int row = (e.getY() - marginY) / SQUARE_SIZE;
+        int col = (e.getX() - marginX) / SQUARE_SIZE;
+
+        if (row < 0 || col < 0) {
+          return;
+        }
+
+        if (row >= Board.BOARD_LENGTH || col >= Board.BOARD_LENGTH) {
+          return;
+        }
+
+        if (board.hasSelected()) {
+          if (board.goTo(row, col)) {
+            return;
+          }
+        }
+
+        board.selectPieceAt(row, col);
+
+      }
+    });
+  }
+
   private void update(float dt) {
+
+    if (pieces.stream().anyMatch(DrawablePiece::requiresReload)) {
+      pieces = board.getDrawables();
+    }
 
     pieces.forEach(m -> m.update(dt));
 
   }
 
   private void render(Graphics2D g) {
-    g.setColor(Color.WHITE);
+    g.setColor(board.isTopTurn() ? Color.BLACK : Color.WHITE);
     g.fillRect(0, 0, windowWidth, windowHeight);
 
     int length = Board.BOARD_LENGTH;
-    int pieceSize = DrawablePiece.SIZE;
-    int boardSize = pieceSize * length;
-
-    g.translate((windowWidth - boardSize) / 2, (windowHeight - boardSize) / 2);
+    int boardSize = SQUARE_SIZE * length;
+    marginX = (windowWidth - boardSize) / 2;
+    marginY = (windowHeight - boardSize) / 2;
+    g.translate(marginX, marginY);
 
     for (int i = 0; i < length * length; i++) {
       g.setColor(i % 2 == i / length % 2 ? Color.WHITE : Color.BLACK);
-      g.fillRect(i % length * pieceSize, i / length * pieceSize, pieceSize, pieceSize);
+      g.fillRect(i % length * SQUARE_SIZE, i / length * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE);
     }
 
     pieces.forEach(m -> m.draw(g));
+    pieces.stream().filter(DrawablePiece::isSelected).forEach(m -> m.drawPositions(g));
 
-    g.setColor(Color.BLACK);
+    g.setColor(board.isTopTurn() ? Color.WHITE : Color.BLACK);
     g.drawRect(0, 0, boardSize, boardSize);
 
   }

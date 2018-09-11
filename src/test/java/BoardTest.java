@@ -78,7 +78,7 @@ public class BoardTest {
     b.addPiece(new King(7, 6, false));
 
     assertTrue(b.selectPieceAt(7, 7));
-    assertFalse(b.captureAt(7, 6));
+    assertFalse(b.goTo(7, 6));
 
   }
 
