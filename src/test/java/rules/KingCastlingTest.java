@@ -2,7 +2,6 @@ package rules;
 
 import chess.engine.Board;
 import chess.engine.pieces.King;
-import chess.engine.pieces.Piece;
 import chess.engine.pieces.Rook;
 import org.junit.Test;
 
@@ -14,13 +13,14 @@ public class KingCastlingTest {
   @Test
   public void testCastling() {
     Board b = Board.getInstance().getEngine();
-    b.setupStandardBoard();
+    b.setupEmptyBoard();
 
-    Piece p = b.getAt(0, 4);
-    b.forceKill(p, 0, 1);
-    b.forceKill(p, 0, 2);
-    b.forceKill(p, 0, 3);
-    b.forceKill(p, 7, 3);
+    b.addPiece(new Rook(0, 0, true));
+    b.addPiece(new Rook(0, 7, true));
+    b.addPiece(new King(0, 4, true));
+    b.addPiece(new Rook(7, 0, false));
+    b.addPiece(new Rook(7, 7, false));
+    b.addPiece(new King(7, 4, false));
 
     assertTrue(b.selectPieceAt(0, 4));
     assertTrue(b.goTo(0, 2));

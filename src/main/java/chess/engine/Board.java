@@ -471,9 +471,9 @@ public final class Board implements BoardInterface {
       return false;
     }
 
-    history.add(action);
 
     if (!skipTurn) {
+      history.add(action);
       turn++;
     }
 

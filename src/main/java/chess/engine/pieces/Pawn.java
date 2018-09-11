@@ -14,8 +14,6 @@ public class Pawn extends Piece {
   public Pawn(int row, int col, boolean isTop) {
     super(row, col, isTop);
 
-    rules.remove(Rule.ATTACK);
-    rules.add(Rule.PAWN_ATTACK);
     rules.add(Rule.EN_PASSANT);
     rules.add(Rule.PAWN_PROMOTION);
 

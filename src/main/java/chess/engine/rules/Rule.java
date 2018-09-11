@@ -15,7 +15,6 @@ public interface Rule {
   Rule NO_CHANGE = new RuleNoChange();
   Rule KING_CASTLING = new RuleKingCastling();
   Rule EN_PASSANT = new RuleEnPassant();
-  Rule PAWN_ATTACK = new RulePawnAttack();
   Rule PAWN_PROMOTION = new RulePawnPromotion();
   Rule NO_CHECK = new RuleNoCheck();
   Rule KING_INVULNERABILITY = new RuleKingInvulnerability();

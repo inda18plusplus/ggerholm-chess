@@ -13,16 +13,20 @@ public class RuleAttack implements Rule {
     }
 
     Piece piece = action.getPiece();
-    Piece target = board.getAt(action.row(), action.col());
-    if (target == null) {
+
+    if (piece
+        .getPossibleAttackPositions()
+        .stream()
+        .noneMatch(m -> m.isAt(action.row(), action.col()))) {
       return Result.NotPassed;
     }
 
-    if (piece.isTop() != target.isTop()
-            && piece
-            .getPossibleAttackPositions()
-            .stream()
-            .anyMatch(m -> m.isAt(action.row(), action.col()))) {
+    Piece target = board.getAt(action.row(), action.col());
+    if (target == null) {
+      return Result.Invalid;
+    }
+
+    if (piece.isTop() != target.isTop()) {
       return Result.Passed;
     }
 

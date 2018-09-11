@@ -10,7 +10,7 @@ import java.io.IOException;
 
 public class DrawablePiece {
 
-  private int size = Game.SQUARE_SIZE / 2;
+  private int size = Game.SQUARE_SIZE;
 
   private float drawX;
   private float drawY;
@@ -48,11 +48,16 @@ public class DrawablePiece {
       return;
     }
 
+    int margin = (Game.SQUARE_SIZE - size) / 2;
+
     if (image == null) {
       g.setColor(piece.isTop() ? Color.ORANGE : Color.PINK);
-      g.fillRect((int) drawX + size / 2, (int) drawY + size / 2, size, size);
+      g.fillRect((int) drawX + margin, (int) drawY + margin, size, size);
     } else {
-      g.drawImage(image, (int) drawX, (int) drawY, size, size, null);
+      g.drawImage(image,
+          (int) drawX + margin,
+          (int) drawY + margin,
+          size, size, null);
     }
 
   }
@@ -96,35 +101,37 @@ public class DrawablePiece {
     switch (piece.toChar()) {
       case 'P':
       case 'p':
-        name = "pawn";
+        name = "Pawn";
         break;
       case 'R':
       case 'r':
-        name = "rook";
+        name = "Rook";
         break;
       case 'Q':
       case 'q':
-        name = "queen";
+        name = "Queen";
         break;
       case 'K':
       case 'k':
-        name = "king";
+        name = "King";
         break;
       case 'H':
       case 'h':
-        name = "knight";
+        name = "Knight";
         break;
       case 'B':
       case 'b':
-        name = "bishop";
+        name = "Bishop";
         break;
       default:
         return;
     }
 
     try {
-      image = ImageIO.read(getClass().getResource(name + ".png"));
-    } catch (IOException | IllegalArgumentException ignored) {
+      name = (piece.isTop() ? "black" : "white") + name + ".png";
+      image = ImageIO.read(getClass().getResource("/images/" + name));
+    } catch (IOException | IllegalArgumentException e) {
+      e.printStackTrace();
       // TODO: Log
     }
 
