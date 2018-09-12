@@ -21,8 +21,8 @@ public final class Square {
   }
 
   /**
-   * Stores the row and column in a combined object.
-   * Also adds the square to the provided set if it is within the bounds of the board.
+   * Stores the row and column in a combined object. Also adds the square to the provided set if it
+   * is within the bounds of the board.
    *
    * @param row The row number.
    * @param col The column number.

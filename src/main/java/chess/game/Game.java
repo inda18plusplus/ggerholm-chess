@@ -1,7 +1,7 @@
-package chess;
+package chess.game;
 
 import chess.engine.Board;
-import chess.game.DrawablePiece;
+import chess.game.drawables.DrawablePiece;
 
 import javax.swing.JFrame;
 import java.awt.Color;
@@ -30,7 +30,7 @@ public class Game extends JFrame implements Runnable {
     createFrame();
 
     board = Board.getInstance().getEngine();
-    board.setupStandardBoard();
+    board.setupStandardBoard(false);
     pieces = board.getDrawables();
 
     setupInput();

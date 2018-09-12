@@ -23,31 +23,42 @@ public interface BoardInterface {
   }
 
   enum State {
-    Check, Checkmate, Stalemate, Normal;
+    Check, Checkmate, Stalemate, Draw, Normal;
 
     protected int turn;
 
   }
 
-  /**
-   * Setups a standard board with 16 pieces in each team.
-   */
-  void setupStandardBoard();
+  enum GameType {
+    Standard, Fischer
+  }
 
   /**
-   * Setups a standard board but with the pieces
-   * on the first ranks of each team shuffled.
+   * Setups a standard board with 16 pieces in each team.
+   *
+   * @param topFirst Whether or not the top team should make the first move.
    */
-  void setupFischerBoard();
+  void setupStandardBoard(boolean topFirst);
+
+  /**
+   * Setups a standard board but with the pieces on the first ranks of each team shuffled.
+   *
+   * @param topFirst Whether or not the top team should make the first move.
+   */
+  void setupFischerBoard(boolean topFirst);
 
   /**
    * Setups an empty board.
+   *
+   * @param topFirst Whether or not the top team should make the first move.
    */
-  void setupEmptyBoard();
+  void setupEmptyBoard(boolean topFirst);
+
+  GameType getGameType();
 
   /**
-   * Tries to select the piece at the provided square. If the piece is of the opponent's team
-   * or the square is empty nothing will happen.
+   * Tries to select the piece at the provided square. If the piece is of the opponent's team or the
+   * square is empty nothing will happen.
    *
    * @param row The row number.
    * @param col The column number.
@@ -56,8 +67,8 @@ public interface BoardInterface {
   boolean selectPieceAt(int row, int col);
 
   /**
-   * Attempts to move the selected unit to the provided square.
-   * If the square is currently occupied, an attack is attempted.
+   * Attempts to move the selected unit to the provided square. If the square is currently occupied,
+   * an attack is attempted.
    *
    * @param row The targeted row.
    * @param col The targeted column.
@@ -74,8 +85,8 @@ public interface BoardInterface {
   boolean isKingInCheck(boolean isTop);
 
   /**
-   * Returns whether or not the king is currently threatened
-   * and there's no way to remove the threat.
+   * Returns whether or not the king is currently threatened and there's no way to remove the
+   * threat.
    *
    * @param isTop Whether to check the top or bottom king.
    * @return True or false.
@@ -90,9 +101,10 @@ public interface BoardInterface {
    */
   boolean isTeamInStalemate(boolean isTop);
 
+  boolean isGameADraw();
+
   /**
-   * Returns the state of the game.
-   * Either Check, Checkmate, Stalemate or Normal.
+   * Returns the state of the game. Either Check, Checkmate, Stalemate or Normal.
    *
    * @return A BoardInterface.State object.
    */
@@ -106,9 +118,8 @@ public interface BoardInterface {
   boolean isPromoting();
 
   /**
-   * Promotes the pawn that has reached the opposite side of the board.
-   * If no such pawn exists nothing is done.
-   * Pawns can be promoted to any other type of piece.
+   * Promotes the pawn that has reached the opposite side of the board. If no such pawn exists
+   * nothing is done. Pawns can be promoted to any other type of piece.
    *
    * @param promotion The class of whatever piece the pawn should be promoted to.
    * @return True if the promotion was successful, otherwise false.
@@ -116,8 +127,8 @@ public interface BoardInterface {
   boolean promoteTo(Promotion promotion);
 
   /**
-   * Returns whether or not it is currently the top team's turn to make a move.
-   * Top and bottom refers to the starting positions of the teams, not any kind of score.
+   * Returns whether or not it is currently the top team's turn to make a move. Top and bottom
+   * refers to the starting positions of the teams, not any kind of score.
    *
    * @return True if the top team is allowed to make a move, otherwise false.
    */
@@ -131,8 +142,8 @@ public interface BoardInterface {
   int getTurn();
 
   /**
-   * Returns the full engine instance that can be manipulated
-   * in ways not possible in an ordinary game.
+   * Returns the full engine instance that can be manipulated in ways not possible in an ordinary
+   * game.
    *
    * @return A Board instance.
    */

@@ -21,7 +21,11 @@ public class ResourceManager {
 
   }
 
-  public void loadImage(String key, String path) {
+  public static ResourceManager getInstance() {
+    return instance;
+  }
+
+  private void loadImage(String key, String path) {
     try {
       BufferedImage image = ImageIO.read(getClass().getResource(path));
       images.put(key, image);
@@ -32,10 +36,6 @@ public class ResourceManager {
 
   public BufferedImage getImage(String key) {
     return images.get(key);
-  }
-
-  public static ResourceManager getInstance() {
-    return instance;
   }
 
 }

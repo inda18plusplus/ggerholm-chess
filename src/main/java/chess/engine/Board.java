@@ -1,6 +1,6 @@
 package chess.engine;
 
-import chess.game.DrawablePiece;
+import chess.game.drawables.DrawablePiece;
 import chess.engine.pieces.Bishop;
 import chess.engine.pieces.King;
 import chess.engine.pieces.Knight;
@@ -31,6 +31,8 @@ public final class Board implements BoardInterface {
   private int turn;
   private Piece selected;
   private State gameState;
+  private GameType gameType;
+
   private List<Piece> pieces = new ArrayList<>();
   private List<Action> history = new ArrayList<>();
 
@@ -43,8 +45,9 @@ public final class Board implements BoardInterface {
   }
 
   @Override
-  public void setupStandardBoard() {
-    setupEmptyBoard();
+  public void setupStandardBoard(boolean topFirst) {
+    setupEmptyBoard(topFirst);
+    gameType = GameType.Standard;
 
     for (int i = 0; i < BOARD_LENGTH * 2; i++) {
       switch (i) {
@@ -91,8 +94,9 @@ public final class Board implements BoardInterface {
   }
 
   @Override
-  public void setupFischerBoard() {
-    setupEmptyBoard();
+  public void setupFischerBoard(boolean topFirst) {
+    setupEmptyBoard(topFirst);
+    gameType = GameType.Fischer;
 
     List<Class<? extends Piece>> topTeam = new ArrayList<>();
     topTeam.add(King.class);
@@ -151,11 +155,17 @@ public final class Board implements BoardInterface {
   }
 
   @Override
-  public void setupEmptyBoard() {
+  public void setupEmptyBoard(boolean topFirst) {
     pieces.clear();
     history.clear();
-    turn = 0;
+    turn = topFirst ? 0 : 1;
     selected = null;
+    gameType = GameType.Standard;
+  }
+
+  @Override
+  public GameType getGameType() {
+    return gameType;
   }
 
   @Override
@@ -167,7 +177,7 @@ public final class Board implements BoardInterface {
     clearSelected();
     selected = getAt(row, col);
 
-    if (selected != null && (isTopTurn() != selected.isTop())) {
+    if (selected != null && isTopTurn() != selected.isTop()) {
       selected = null;
       return false;
     }
@@ -221,7 +231,6 @@ public final class Board implements BoardInterface {
     }
 
     // --- Check if the attackers can be captured ---
-
     List<Piece> attackers = getEnemyPieces(isTop)
         .stream()
         .filter(m -> m.isAllowed(this, new Action(m, king.pos(), Action.Type.Attack)))
@@ -233,7 +242,6 @@ public final class Board implements BoardInterface {
       return false;
     }
 
-    // --- Check if any move by any friendly piece would block the attackers ---
     return getFriendlyPieces(isTop).stream().allMatch(m -> getValidPositions(m).isEmpty());
   }
 
@@ -249,6 +257,48 @@ public final class Board implements BoardInterface {
   }
 
   @Override
+  public boolean isGameADraw() {
+    if (gameType != GameType.Standard) {
+      return false;
+    }
+
+    if (pieces.stream().allMatch(m -> m instanceof King)) {
+      return true;
+    }
+
+    if (pieces.size() == 3) {
+      if (pieces.stream().filter(m -> m instanceof King).count() == 2
+          && pieces.stream().anyMatch(m -> m instanceof Bishop || m instanceof Knight)) {
+        return true;
+      }
+    }
+
+    if (pieces.size() == 4) {
+      if (getEnemyPieces(true)
+          .stream()
+          .filter(m -> m instanceof King || m instanceof Bishop)
+          .anyMatch(m -> m instanceof Bishop)) {
+        if (getFriendlyPieces(true)
+            .stream()
+            .filter(m -> m instanceof King || m instanceof Bishop)
+            .anyMatch(m -> m instanceof Bishop)) {
+
+          return pieces
+              .stream()
+              .filter(m -> m instanceof Bishop)
+              .allMatch(m -> m.row() % 2 == m.col() % 2)
+              || pieces
+              .stream()
+              .filter(m -> m instanceof Bishop)
+              .allMatch(m -> m.row() % 2 != m.col() % 2);
+        }
+      }
+    }
+
+    return false;
+  }
+
+  @Override
   public State getGameState() {
     if (gameState != null) {
       if (gameState.turn == turn) {
@@ -256,7 +306,9 @@ public final class Board implements BoardInterface {
       }
     }
 
-    if (isKingInCheck(isTopTurn())) {
+    if (isGameADraw()) {
+      gameState = State.Draw;
+    } else if (isKingInCheck(isTopTurn())) {
       if (isTeamInCheckmate(isTopTurn())) {
         gameState = State.Checkmate;
       } else {
@@ -290,11 +342,11 @@ public final class Board implements BoardInterface {
           int.class,
           boolean.class)
           .newInstance(piece.row(), piece.col(), piece.isTop());
+      promoted.setState(Piece.State.Alive);
 
       pieces.remove(promotionIndex);
       pieces.add(promotionIndex, promoted);
       promotionIndex = -1;
-      promoteAfterAction = false;
 
     } catch (InstantiationException
         | IllegalAccessException
@@ -338,8 +390,8 @@ public final class Board implements BoardInterface {
    * Forces the unit (if any) on the provided square to be removed and does not increase the turn.
    *
    * @param attacker The attacker. This piece will only be logged to the history.
-   * @param row      The targeted row.
-   * @param col      The targeted column.
+   * @param row The targeted row.
+   * @param col The targeted column.
    */
   public void forceKill(Piece attacker, int row, int col) {
 
@@ -361,8 +413,8 @@ public final class Board implements BoardInterface {
    *
    * @param fromRow The original row.
    * @param fromCol The original column.
-   * @param toRow   The new row.
-   * @param toCol   The new column.
+   * @param toRow The new row.
+   * @param toCol The new column.
    */
   public void forceMove(int fromRow, int fromCol, int toRow, int toCol) {
     pieces.stream().filter(m -> m.isAt(fromRow, fromCol)).findAny().ifPresent(m -> {
@@ -397,14 +449,6 @@ public final class Board implements BoardInterface {
   }
 
   private boolean moveTo(int row, int col) {
-    if (isPromoting()) {
-      return false;
-    }
-
-    if (selected == null) {
-      return false;
-    }
-
     Action action = new Action(selected, row, col, Action.Type.Move);
     action.insertAct(true, () -> selected.moveTo(row, col));
     if (!selected.isAllowed(this, action)) {
@@ -420,14 +464,6 @@ public final class Board implements BoardInterface {
   }
 
   private boolean captureAt(int row, int col) {
-    if (isPromoting()) {
-      return false;
-    }
-
-    if (selected == null) {
-      return false;
-    }
-
     Action action = new Action(selected, row, col, Action.Type.Attack);
     action.insertAct(true,
         () -> pieces.removeIf(m -> {
@@ -456,14 +492,13 @@ public final class Board implements BoardInterface {
   /**
    * Returns whether or not a square is potentially under attack.
    *
-   * @param row    The row number.
-   * @param col    The column number.
-   * @param isTop  Assumes the square has a unit from this team (top if true, bottom if false).
+   * @param row The row number.
+   * @param col The column number.
+   * @param isTop Assumes the square has a unit from this team (top if true, bottom if false).
    * @param isPawn A pawn can also be attacked using its special move, unlike other pieces.
    * @return True if any unit in the enemy team could mount an attack towards this square.
    */
   public boolean isSquareUnderAttack(int row, int col, boolean isTop, boolean isPawn) {
-
     if (isPawn
         && pieces
         .stream()
@@ -488,10 +523,10 @@ public final class Board implements BoardInterface {
       return false;
     }
 
-
     if (!skipTurn) {
       history.add(action);
       turn++;
+      // TODO: Log / remove println
       System.out.println(action.toString());
     }
 
@@ -499,6 +534,7 @@ public final class Board implements BoardInterface {
       for (int i = 0; i < pieces.size(); i++) {
         if (pieces.get(i).isAt(action.row(), action.col())) {
           promotionIndex = i;
+          promoteAfterAction = false;
           break;
         }
       }
@@ -562,8 +598,8 @@ public final class Board implements BoardInterface {
   }
 
   /**
-   * Creates a shallow copy of the current board.
-   * Changes executed to the shallow copy will not interfere with the original instance.
+   * Creates a shallow copy of the current board. Changes executed to the shallow copy will not
+   * interfere with the original instance.
    *
    * @return A shallow copy of the board.
    */

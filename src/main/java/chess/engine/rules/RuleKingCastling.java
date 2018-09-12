@@ -41,7 +41,7 @@ public class RuleKingCastling implements Rule {
     action.insertAct(true, () ->
         board.forceMove(target.row(), target.col(), action.row(), action.col() - dir)
     );
-    action.insertAct(false, () -> action.setMessage("Castling"));
+    action.insertAct(false, () -> action.setNote("Castling"));
 
     return Result.Passed;
   }

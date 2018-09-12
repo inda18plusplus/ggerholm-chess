@@ -7,8 +7,8 @@ public class Knight extends Piece {
   /**
    * A knight piece.
    *
-   * @param row   The row of the piece.
-   * @param col   The col of the piece.
+   * @param row The row of the piece.
+   * @param col The col of the piece.
    * @param isTop Whether the piece belongs to the top or bottom team.
    */
   public Knight(int row, int col, boolean isTop) {

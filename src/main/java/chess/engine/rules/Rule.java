@@ -20,19 +20,19 @@ public interface Rule {
   Rule KING_INVULNERABILITY = new RuleKingInvulnerability();
 
   /**
-   * Returns whether or not an action is allowed according to the specific rule.
-   * Superior rules that are passed may also add further acts to the action,
-   * which will be executed along with the original ones.
+   * Returns whether or not an action is allowed according to the specific rule. Superior rules that
+   * are passed may also add further acts to the action, which will be executed along with the
+   * original ones.
    *
-   * @param board  The current board.
+   * @param board The current board.
    * @param action The action to be executed.
    * @return True if the action passed the rule, otherwise false.
    */
   Result isActionAllowed(Board board, Action action);
 
   /**
-   * A superior rule is a rule that makes all other rules redundant when passed.
-   * They are usually used when the rule itself adds further acts to the action.
+   * A superior rule is a rule that makes all other rules redundant when passed. They are usually
+   * used when the rule itself adds further acts to the action.
    *
    * @return True or false.
    */

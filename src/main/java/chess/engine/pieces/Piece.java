@@ -12,24 +12,19 @@ import java.util.Set;
 
 public abstract class Piece {
 
-  public enum State {
-    Selected, Captured, Alive, Promoted
-  }
-
+  final Set<Square> possiblePositions = new HashSet<>();
+  final Set<Square> possibleAttacks = new HashSet<>();
+  final List<Rule> rules = new ArrayList<>();
   private State state;
   private Square position;
   private boolean isTop;
   private boolean hasMoved;
 
-  final Set<Square> possiblePositions = new HashSet<>();
-  final Set<Square> possibleAttacks = new HashSet<>();
-  final List<Rule> rules = new ArrayList<>();
-
   /**
    * The abstract piece class, inherited by all different pieces of the game.
    *
-   * @param row   The row of the piece.
-   * @param col   The column of the piece.
+   * @param row The row of the piece.
+   * @param col The column of the piece.
    * @param isTop Whether the piece belongs to the top or bottom team.
    */
   Piece(int row, int col, boolean isTop) {
@@ -61,12 +56,12 @@ public abstract class Piece {
     return new HashSet<>(possibleAttacks);
   }
 
-  public void setState(State state) {
-    this.state = state;
-  }
-
   public State getState() {
     return state;
+  }
+
+  public void setState(State state) {
+    this.state = state;
   }
 
   public boolean hasMoved() {
@@ -74,8 +69,7 @@ public abstract class Piece {
   }
 
   /**
-   * Moves the piece to the provided square.
-   * Also recalculates possible next moves.
+   * Moves the piece to the provided square. Also recalculates possible next moves.
    *
    * @param row The new row.
    * @param col The new column.
@@ -138,7 +132,7 @@ public abstract class Piece {
   /**
    * Returns whether or not an action is allowed to be executed.
    *
-   * @param board  The game board.
+   * @param board The game board.
    * @param action The action to be executed.
    * @return True if a special action triggered or all conditions for a normal move were passed.
    */
@@ -155,8 +149,8 @@ public abstract class Piece {
   }
 
   /**
-   * Creates a shallow copy of the piece.
-   * Changes made to the shallow copy will not interfere with the original.
+   * Creates a shallow copy of the piece. Changes made to the shallow copy will not interfere with
+   * the original.
    *
    * @return A piece object if a shallow copy was successfully created, otherwise null.
    */
@@ -167,6 +161,7 @@ public abstract class Piece {
       shallow = this.getClass()
           .getConstructor(int.class, int.class, boolean.class)
           .newInstance(position.row(), position.col(), isTop);
+      shallow.state = state;
       shallow.hasMoved = hasMoved;
       shallow.redoPositions();
       return shallow;
@@ -189,6 +184,10 @@ public abstract class Piece {
         getClass().getSimpleName(),
         row(),
         col());
+  }
+
+  public enum State {
+    Selected, Captured, Alive, Promoted
   }
 
 }

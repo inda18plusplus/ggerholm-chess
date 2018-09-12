@@ -7,8 +7,8 @@ public class Pawn extends Piece {
   /**
    * A pawn piece.
    *
-   * @param row   The row of the piece.
-   * @param col   The col of the piece.
+   * @param row The row of the piece.
+   * @param col The col of the piece.
    * @param isTop Whether the piece belongs to the top or bottom team.
    */
   public Pawn(int row, int col, boolean isTop) {

@@ -58,7 +58,7 @@ public class RuleEnPassant implements Rule {
           || !piece.isTop() && row == piece.row() - 1) {
 
         action.insertAct(true, () -> board.forceKill(piece, piece.row(), col));
-        action.insertAct(false, () -> action.setMessage("En Passant"));
+        action.insertAct(false, () -> action.setNote("En Passant"));
         return Result.Passed;
       }
 

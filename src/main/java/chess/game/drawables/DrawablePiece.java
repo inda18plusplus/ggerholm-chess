@@ -1,7 +1,8 @@
-package chess.game;
+package chess.game.drawables;
 
-import chess.Game;
 import chess.engine.pieces.Piece;
+import chess.game.Game;
+import chess.game.ResourceManager;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -29,6 +30,11 @@ public class DrawablePiece {
     loadImage();
   }
 
+  /**
+   * Updates the visible information of the piece.
+   *
+   * @param dt The delta-time. Used to determine velocity.
+   */
   public void update(float dt) {
     float horizontalMove = drawX - piece.col() * Game.SQUARE_SIZE;
     float verticalMove = drawY - piece.row() * Game.SQUARE_SIZE;
@@ -42,6 +48,11 @@ public class DrawablePiece {
 
   }
 
+  /**
+   * Draws the piece.
+   *
+   * @param g The graphic's object to draw onto.
+   */
   public void draw(Graphics2D g) {
     if (piece.getState() == Piece.State.Captured) {
       return;
@@ -61,6 +72,11 @@ public class DrawablePiece {
 
   }
 
+  /**
+   * Draws the possible moves of the piece if it's currently selected.
+   *
+   * @param g The graphic's object to draw onto.
+   */
   public void drawPositions(Graphics2D g) {
     if (piece.getState() != Piece.State.Selected) {
       return;
