@@ -11,7 +11,7 @@ public class RuleEnPassant implements Rule {
 
   @Override
   public Result isActionAllowed(Board board, Action action) {
-    if (!action.getType().equals(Action.Type.Move)) {
+    if (action.getType() != Action.Type.Move) {
       return Result.Invalid;
     }
 
@@ -25,7 +25,7 @@ public class RuleEnPassant implements Rule {
       return Result.NotPassed;
     }
 
-    if (!lastAction.getType().equals(Action.Type.Move)) {
+    if (lastAction.getType() != Action.Type.Move) {
       return Result.NotPassed;
     }
 
@@ -55,9 +55,10 @@ public class RuleEnPassant implements Rule {
     if (col == piece.col() - 1 || col == piece.col() + 1) {
 
       if (piece.isTop() && row == piece.row() + 1
-              || !piece.isTop() && row == piece.row() - 1) {
+          || !piece.isTop() && row == piece.row() - 1) {
 
         action.insertAct(true, () -> board.forceKill(piece, piece.row(), col));
+        action.insertAct(false, () -> action.setMessage("En Passant"));
         return Result.Passed;
       }
 

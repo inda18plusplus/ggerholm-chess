@@ -1,6 +1,7 @@
 package chess;
 
 import chess.engine.Board;
+import chess.game.DrawablePiece;
 
 import javax.swing.JFrame;
 import java.awt.Color;
@@ -12,7 +13,7 @@ import java.util.List;
 
 public class Game extends JFrame implements Runnable {
 
-  static int SQUARE_SIZE = 80;
+  public static int SQUARE_SIZE = 80;
   private int windowWidth = 960;
   private int windowHeight = 720;
 
@@ -105,6 +106,8 @@ public class Game extends JFrame implements Runnable {
 
     g.setColor(board.isTopTurn() ? Color.WHITE : Color.BLACK);
     g.drawRect(0, 0, boardSize, boardSize);
+
+    g.drawString(board.getGameState().name(), -marginX / 2, 50);
 
   }
 

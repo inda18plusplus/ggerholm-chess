@@ -1,6 +1,6 @@
 package chess.engine;
 
-import chess.DrawablePiece;
+import chess.game.DrawablePiece;
 import chess.engine.pieces.Bishop;
 import chess.engine.pieces.King;
 import chess.engine.pieces.Knight;
@@ -30,6 +30,7 @@ public final class Board implements BoardInterface {
   private int promotionIndex = -1;
   private int turn;
   private Piece selected;
+  private State gameState;
   private List<Piece> pieces = new ArrayList<>();
   private List<Action> history = new ArrayList<>();
 
@@ -249,17 +250,26 @@ public final class Board implements BoardInterface {
 
   @Override
   public State getGameState() {
-    if (isKingInCheck(isTopTurn())) {
-      if (isTeamInCheckmate(isTopTurn())) {
-        return State.Checkmate;
-      } else {
-        return State.Check;
+    if (gameState != null) {
+      if (gameState.turn == turn) {
+        return gameState;
       }
-    } else if (isTeamInStalemate(isTopTurn())) {
-      return State.Stalemate;
     }
 
-    return State.Normal;
+    if (isKingInCheck(isTopTurn())) {
+      if (isTeamInCheckmate(isTopTurn())) {
+        gameState = State.Checkmate;
+      } else {
+        gameState = State.Check;
+      }
+    } else if (isTeamInStalemate(isTopTurn())) {
+      gameState = State.Stalemate;
+    } else {
+      gameState = State.Normal;
+    }
+
+    gameState.turn = turn;
+    return gameState;
   }
 
   @Override
@@ -357,7 +367,14 @@ public final class Board implements BoardInterface {
   public void forceMove(int fromRow, int fromCol, int toRow, int toCol) {
     pieces.stream().filter(m -> m.isAt(fromRow, fromCol)).findAny().ifPresent(m -> {
 
-      pieces.removeIf(p -> p.isAt(toRow, toCol));
+      pieces.removeIf(p -> {
+        if (p.isAt(toRow, toCol)) {
+          p.setState(Piece.State.Captured);
+          return true;
+        }
+
+        return false;
+      });
 
       Action moveAction = new Action(m, toRow, toCol, Action.Type.Move);
       moveAction.insertAct(true, () -> m.moveTo(toRow, toCol));
@@ -475,6 +492,7 @@ public final class Board implements BoardInterface {
     if (!skipTurn) {
       history.add(action);
       turn++;
+      System.out.println(action.toString());
     }
 
     if (promoteAfterAction) {

@@ -5,6 +5,7 @@ import chess.engine.pieces.Square;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public final class Action {
 
@@ -16,6 +17,7 @@ public final class Action {
   private int row;
   private int col;
   private Type type;
+  private String message;
   private List<Runnable> acts = new ArrayList<>();
 
   /**
@@ -62,6 +64,10 @@ public final class Action {
     acts.clear();
   }
 
+  public void setMessage(String message) {
+    this.message = message;
+  }
+
   /**
    * The targeted row of this action.
    *
@@ -101,16 +107,17 @@ public final class Action {
   /**
    * Converts the action into a readable String.
    *
-   * @return A string in the format "Type Piece From(row, column) To(row, column)".
+   * @return A string in the format "Piece Type From(row, column) To(row, column)".
    */
   public String toString() {
-    return String.format("%s %s (%d, %d) (%d, %d)",
-            type.toString(),
-            piece.getClass().getSimpleName(),
-            piece.row(),
-            piece.col(),
-            row,
-            col);
+    return String.format("%s %s (%d, %d) (%d, %d) %s",
+        piece.getClass().getSimpleName(),
+        type.toString(),
+        piece.row(),
+        piece.col(),
+        row,
+        col,
+        Optional.ofNullable(message).orElse("")).trim();
   }
 
 }

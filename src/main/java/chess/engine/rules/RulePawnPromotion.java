@@ -39,6 +39,7 @@ public class RulePawnPromotion implements Rule {
 
           action.insertAct(true, board::promoteAfterAction);
           action.insertAct(true, () -> board.forceKill(piece, row, col));
+          action.insertAct(false, () -> action.setMessage("Pawn Promotion"));
 
           return Result.Passed;
         }

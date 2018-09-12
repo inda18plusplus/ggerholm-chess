@@ -7,16 +7,16 @@ public class RuleMovement implements Rule {
 
   @Override
   public Result isActionAllowed(Board board, Action action) {
-    if (!action.getType().equals(Action.Type.Move)) {
+    if (action.getType() != Action.Type.Move) {
       return Result.Invalid;
     }
 
     if (action
-            .getPiece()
-            .getPossiblePositions()
-            .stream()
-            .anyMatch(m -> m.isAt(action.row(), action.col())
-                    && board.getAt(action.row(), action.col()) == null)) {
+        .getPiece()
+        .getPossiblePositions()
+        .stream()
+        .anyMatch(m -> m.isAt(action.row(), action.col())
+            && board.getAt(action.row(), action.col()) == null)) {
       return Result.Passed;
     }
 

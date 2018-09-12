@@ -13,7 +13,7 @@ import static org.junit.Assert.assertTrue;
 public class BoardTest {
 
   @Test
-  public void testSquareUnderAtttack() {
+  public void testSquareUnderAttack() {
     Board b = Board.getInstance().getEngine();
     b.setupStandardBoard();
 

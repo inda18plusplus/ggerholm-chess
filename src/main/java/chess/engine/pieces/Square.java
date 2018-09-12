@@ -4,10 +4,10 @@ import chess.engine.Board;
 
 import java.util.Set;
 
-public class Square {
+public final class Square {
 
-  private int row;
-  private int col;
+  private final int row;
+  private final int col;
 
   /**
    * Stores the row and column in a combined object.
@@ -52,11 +52,6 @@ public class Square {
    */
   public int col() {
     return col;
-  }
-
-  void set(int row, int col) {
-    this.row = row;
-    this.col = col;
   }
 
   public boolean isAt(int row, int col) {

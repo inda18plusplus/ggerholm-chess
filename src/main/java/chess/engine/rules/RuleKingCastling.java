@@ -12,8 +12,8 @@ public class RuleKingCastling implements Rule {
   public Result isActionAllowed(Board board, Action action) {
     Piece piece = action.getPiece();
     Piece target = board.getAt(
-            action.row(),
-            action.col() < Board.BOARD_LENGTH / 2 ? 0 : Board.BOARD_LENGTH - 1);
+        action.row(),
+        action.col() < Board.BOARD_LENGTH / 2 ? 0 : Board.BOARD_LENGTH - 1);
 
     if (!(piece instanceof King) || !(target instanceof Rook)) {
       return Result.Invalid;
@@ -27,7 +27,7 @@ public class RuleKingCastling implements Rule {
       return Result.NotPassed;
     }
 
-    if (Rule.NO_OVERLAP.isActionAllowed(board, action).equals(Result.NotPassed)) {
+    if (Rule.NO_OVERLAP.isActionAllowed(board, action) == Result.NotPassed) {
       return Result.NotPassed;
     }
 
@@ -39,8 +39,9 @@ public class RuleKingCastling implements Rule {
     }
 
     action.insertAct(true, () ->
-            board.forceMove(target.row(), target.col(), action.row(), action.col() - dir)
+        board.forceMove(target.row(), target.col(), action.row(), action.col() - dir)
     );
+    action.insertAct(false, () -> action.setMessage("Castling"));
 
     return Result.Passed;
   }

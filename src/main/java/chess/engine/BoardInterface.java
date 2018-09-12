@@ -23,7 +23,10 @@ public interface BoardInterface {
   }
 
   enum State {
-    Check, Checkmate, Stalemate, Normal
+    Check, Checkmate, Stalemate, Normal;
+
+    protected int turn;
+
   }
 
   /**

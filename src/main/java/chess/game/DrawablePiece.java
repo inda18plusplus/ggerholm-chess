@@ -1,12 +1,11 @@
-package chess;
+package chess.game;
 
+import chess.Game;
 import chess.engine.pieces.Piece;
 
-import javax.imageio.ImageIO;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.io.IOException;
 
 public class DrawablePiece {
 
@@ -30,7 +29,7 @@ public class DrawablePiece {
     loadImage();
   }
 
-  void update(float dt) {
+  public void update(float dt) {
     float horizontalMove = drawX - piece.col() * Game.SQUARE_SIZE;
     float verticalMove = drawY - piece.row() * Game.SQUARE_SIZE;
 
@@ -43,7 +42,7 @@ public class DrawablePiece {
 
   }
 
-  void draw(Graphics2D g) {
+  public void draw(Graphics2D g) {
     if (piece.getState() == Piece.State.Captured) {
       return;
     }
@@ -62,17 +61,17 @@ public class DrawablePiece {
 
   }
 
-  void drawPositions(Graphics2D g) {
+  public void drawPositions(Graphics2D g) {
     if (piece.getState() != Piece.State.Selected) {
       return;
     }
 
     g.setColor(Color.GREEN);
     piece.getPossiblePositions().forEach(m -> g.fillOval(
-        m.col() * Game.SQUARE_SIZE + Game.SQUARE_SIZE * 3 / 8,
-        m.row() * Game.SQUARE_SIZE + Game.SQUARE_SIZE * 3 / 8,
-        Game.SQUARE_SIZE / 4,
-        Game.SQUARE_SIZE / 4
+        m.col() * Game.SQUARE_SIZE + Game.SQUARE_SIZE / 4,
+        m.row() * Game.SQUARE_SIZE + Game.SQUARE_SIZE / 4,
+        Game.SQUARE_SIZE / 2,
+        Game.SQUARE_SIZE / 2
     ));
 
     g.setColor(Color.RED);
@@ -84,11 +83,11 @@ public class DrawablePiece {
     ));
   }
 
-  boolean isSelected() {
+  public boolean isSelected() {
     return piece != null && piece.getState() == Piece.State.Selected;
   }
 
-  boolean requiresReload() {
+  public boolean requiresReload() {
     return piece != null && piece.getState() == Piece.State.Promoted;
   }
 
@@ -127,13 +126,7 @@ public class DrawablePiece {
         return;
     }
 
-    try {
-      name = (piece.isTop() ? "black" : "white") + name + ".png";
-      image = ImageIO.read(getClass().getResource("/images/" + name));
-    } catch (IOException | IllegalArgumentException e) {
-      e.printStackTrace();
-      // TODO: Log
-    }
+    image = ResourceManager.getInstance().getImage((piece.isTop() ? "black" : "white") + name);
 
   }
 

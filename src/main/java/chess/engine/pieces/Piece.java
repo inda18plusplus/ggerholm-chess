@@ -6,7 +6,6 @@ import chess.engine.rules.Rule;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -55,11 +54,11 @@ public abstract class Piece {
   }
 
   public Set<Square> getPossiblePositions() {
-    return Collections.unmodifiableSet(possiblePositions);
+    return new HashSet<>(possiblePositions);
   }
 
   public Set<Square> getPossibleAttackPositions() {
-    return possibleAttacks;
+    return new HashSet<>(possibleAttacks);
   }
 
   public void setState(State state) {
@@ -83,7 +82,7 @@ public abstract class Piece {
    */
   public void moveTo(int row, int col) {
     if (!isAt(row, col)) {
-      position.set(row, col);
+      position = new Square(row, col);
       hasMoved = true;
 
       redoPositions();
@@ -175,6 +174,7 @@ public abstract class Piece {
         | IllegalAccessException
         | InvocationTargetException
         | NoSuchMethodException ignored) {
+      // TODO: Log
       return null;
     }
   }

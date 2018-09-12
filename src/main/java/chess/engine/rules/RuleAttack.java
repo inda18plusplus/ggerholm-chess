@@ -8,7 +8,7 @@ public class RuleAttack implements Rule {
 
   @Override
   public Result isActionAllowed(Board board, Action action) {
-    if (!action.getType().equals(Action.Type.Attack)) {
+    if (action.getType() != Action.Type.Attack) {
       return Result.Invalid;
     }
 
