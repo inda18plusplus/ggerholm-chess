@@ -10,7 +10,7 @@ public class RuleNoCheck implements Rule {
   public Result isActionAllowed(Board board, Action action) {
     Piece piece = action.getPiece();
 
-    Board shallow = board.getShallowCopy();
+    Board shallow = board.getDeepCopy();
     shallow.forceMove(piece.row(), piece.col(), action.row(), action.col());
 
     if (shallow.isKingInCheck(piece.isTop())) {

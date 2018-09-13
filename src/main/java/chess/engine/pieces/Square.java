@@ -39,7 +39,7 @@ public final class Square {
   /**
    * The row of the square.
    *
-   * @return Integer in the range 0 - 7.
+   * @return An integer within the range of the board.
    */
   public int row() {
     return row;
@@ -48,7 +48,7 @@ public final class Square {
   /**
    * The column of the square.
    *
-   * @return Integer in the range 0 - 7.
+   * @return An integer within the range of the board.
    */
   public int col() {
     return col;

@@ -30,7 +30,7 @@ public class Game extends JFrame implements Runnable {
     createFrame();
 
     board = Board.getInstance().getEngine();
-    board.setupStandardBoard(false);
+    board.setupEmptyBoard(false);
     pieces = board.getDrawables();
 
     setupInput();

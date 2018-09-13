@@ -105,7 +105,7 @@ public abstract class Piece {
   /**
    * Returns the row of the piece.
    *
-   * @return An integer in the range 0 - 7.
+   * @return An integer within the range of the board.
    */
   public int row() {
     return position.row();
@@ -114,7 +114,7 @@ public abstract class Piece {
   /**
    * Returns the column of the piece.
    *
-   * @return An integer in the range 0 - 7.
+   * @return An integer within the range of the board.
    */
   public int col() {
     return position.col();
@@ -168,8 +168,9 @@ public abstract class Piece {
     } catch (InstantiationException
         | IllegalAccessException
         | InvocationTargetException
-        | NoSuchMethodException ignored) {
-      // TODO: Log
+        | NoSuchMethodException e) {
+      e.printStackTrace();
+      System.exit(1);
       return null;
     }
   }

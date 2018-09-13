@@ -13,12 +13,12 @@ public final class Action {
     Move, Attack
   }
 
-  private Piece piece;
-  private int row;
-  private int col;
-  private Type type;
   private String note;
-  private List<Runnable> acts = new ArrayList<>();
+  private final Piece piece;
+  private final int row;
+  private final int col;
+  private final Type type;
+  private final List<Runnable> acts = new ArrayList<>();
 
   /**
    * Creates an action-object to describe a move by one Piece.
@@ -70,7 +70,7 @@ public final class Action {
   /**
    * The targeted row of this action.
    *
-   * @return The row number between 0 - 7.
+   * @return An integer within the range of the board.
    */
   public int row() {
     return row;
@@ -79,7 +79,7 @@ public final class Action {
   /**
    * The targeted column of this action.
    *
-   * @return The column number between 0 - 7.
+   * @return An integer within the range of the board.
    */
   public int col() {
     return col;

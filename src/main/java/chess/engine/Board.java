@@ -1,6 +1,5 @@
 package chess.engine;
 
-import chess.game.drawables.DrawablePiece;
 import chess.engine.pieces.Bishop;
 import chess.engine.pieces.King;
 import chess.engine.pieces.Knight;
@@ -10,7 +9,7 @@ import chess.engine.pieces.Queen;
 import chess.engine.pieces.Rook;
 import chess.engine.pieces.Square;
 import chess.engine.rules.Rule;
-
+import chess.game.drawables.DrawablePiece;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,17 +17,19 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public final class Board implements BoardInterface {
 
   public static final int BOARD_LENGTH = 8;
 
-  private static Board instance = new Board();
+  private static BoardInterface instance = new Board();
 
   private boolean promoteAfterAction;
   private int promotionIndex = -1;
   private int turn;
+
   private Piece selected;
   private State gameState;
   private GameType gameType;
@@ -145,8 +146,9 @@ public final class Board implements BoardInterface {
           } catch (InstantiationException
               | IllegalAccessException
               | InvocationTargetException
-              | NoSuchMethodException ignored) {
-            // TODO: Log
+              | NoSuchMethodException e) {
+            e.printStackTrace();
+            System.exit(1);
           }
           break;
       }
@@ -351,8 +353,9 @@ public final class Board implements BoardInterface {
     } catch (InstantiationException
         | IllegalAccessException
         | InvocationTargetException
-        | NoSuchMethodException ignored) {
-      // TODO: Log
+        | NoSuchMethodException e) {
+      e.printStackTrace();
+      System.exit(1);
       return false;
     }
 
@@ -395,13 +398,7 @@ public final class Board implements BoardInterface {
    */
   public void forceKill(Piece attacker, int row, int col) {
 
-    if (pieces.removeIf(m -> {
-      if (m.isAt(row, col)) {
-        m.setState(Piece.State.Captured);
-        return true;
-      }
-      return false;
-    })) {
+    if (capturePiecesIf(m -> m.isAt(row, col))) {
       takeAction(new Action(attacker, row, col, Action.Type.Attack), true, 0);
     }
 
@@ -419,14 +416,7 @@ public final class Board implements BoardInterface {
   public void forceMove(int fromRow, int fromCol, int toRow, int toCol) {
     pieces.stream().filter(m -> m.isAt(fromRow, fromCol)).findAny().ifPresent(m -> {
 
-      pieces.removeIf(p -> {
-        if (p.isAt(toRow, toCol)) {
-          p.setState(Piece.State.Captured);
-          return true;
-        }
-
-        return false;
-      });
+      capturePiecesIf(n -> n.isAt(toRow, toCol));
 
       Action moveAction = new Action(m, toRow, toCol, Action.Type.Move);
       moveAction.insertAct(true, () -> m.moveTo(toRow, toCol));
@@ -466,14 +456,7 @@ public final class Board implements BoardInterface {
   private boolean captureAt(int row, int col) {
     Action action = new Action(selected, row, col, Action.Type.Attack);
     action.insertAct(true,
-        () -> pieces.removeIf(m -> {
-          if (m.isTop() != isTopTurn() && m.isAt(row, col)) {
-            m.setState(Piece.State.Captured);
-            return true;
-          }
-
-          return false;
-        }));
+        () -> capturePiecesIf(m -> m.isTop() != isTopTurn() && m.isAt(row, col)));
     action.insertAct(false,
         () -> selected.moveTo(row, col));
 
@@ -526,8 +509,6 @@ public final class Board implements BoardInterface {
     if (!skipTurn) {
       history.add(action);
       turn++;
-      // TODO: Log / remove println
-      System.out.println(action.toString());
     }
 
     if (promoteAfterAction) {
@@ -597,13 +578,23 @@ public final class Board implements BoardInterface {
         .findFirst().orElse(null);
   }
 
+  private boolean capturePiecesIf(Predicate<Piece> condition) {
+    return pieces.removeIf(m -> {
+      if (condition.test(m)) {
+        m.setState(Piece.State.Captured);
+        return true;
+      }
+      return false;
+    });
+  }
+
   /**
-   * Creates a shallow copy of the current board. Changes executed to the shallow copy will not
+   * Creates a deep copy of the current board. Changes executed to the shallow copy will not
    * interfere with the original instance.
    *
    * @return A shallow copy of the board.
    */
-  public Board getShallowCopy() {
+  public Board getDeepCopy() {
     Board shallow = new Board();
     shallow.pieces = new ArrayList<>(pieces)
         .stream()
