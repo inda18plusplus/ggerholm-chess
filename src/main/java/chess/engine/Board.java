@@ -40,6 +40,10 @@ public final class Board implements BoardInterface {
   private Board() {
   }
 
+  public static BoardInterface getInstance() {
+    return instance;
+  }
+
   @Override
   public Board getEngine() {
     return this;
@@ -614,10 +618,6 @@ public final class Board implements BoardInterface {
     Arrays.fill(board, '.');
     pieces.forEach(m -> board[m.row() * BOARD_LENGTH + m.col()] = m.toChar());
     return new String(board);
-  }
-
-  public static BoardInterface getInstance() {
-    return instance;
   }
 
 }

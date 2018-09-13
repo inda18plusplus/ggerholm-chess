@@ -2,14 +2,13 @@ package chess.game;
 
 import chess.engine.Board;
 import chess.game.drawables.DrawablePiece;
-
-import javax.swing.JFrame;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferStrategy;
 import java.util.List;
+import javax.swing.JFrame;
 
 public class Game extends JFrame implements Runnable {
 
@@ -24,6 +23,11 @@ public class Game extends JFrame implements Runnable {
   private List<DrawablePiece> pieces;
 
   private Game() {
+  }
+
+  public static void main(String[] args) {
+    Game game = new Game();
+    game.start();
   }
 
   private void start() {
@@ -159,11 +163,6 @@ public class Game extends JFrame implements Runnable {
 
     }
 
-  }
-
-  public static void main(String[] args) {
-    Game game = new Game();
-    game.start();
   }
 
 }
