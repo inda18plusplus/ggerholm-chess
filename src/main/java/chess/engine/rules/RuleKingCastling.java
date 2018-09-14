@@ -1,6 +1,7 @@
 package chess.engine.rules;
 
 import chess.engine.Action;
+import chess.engine.Action.Type;
 import chess.engine.Board;
 import chess.engine.pieces.King;
 import chess.engine.pieces.Piece;
@@ -10,10 +11,12 @@ public class RuleKingCastling implements Rule {
 
   @Override
   public Result isActionAllowed(Board board, Action action) {
+    if (action.getType() != Type.Move) {
+      return Result.Invalid;
+    }
+
     Piece piece = action.getPiece();
-    Piece target = board.getAt(
-        action.row(),
-        action.col() < Board.BOARD_LENGTH / 2 ? 0 : Board.BOARD_LENGTH - 1);
+    Piece target = board.getRook(piece.isTop(), action.col() < piece.col());
 
     if (!(piece instanceof King) || !(target instanceof Rook)) {
       return Result.Invalid;

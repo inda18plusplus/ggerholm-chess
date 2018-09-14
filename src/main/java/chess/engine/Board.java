@@ -14,6 +14,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -148,7 +149,8 @@ public final class Board implements BoardInterface {
     pieces.add(new King(7, a[1], false));
 
     for (int i = 0; i < BOARD_LENGTH; i++) {
-      Piece piece = pieces.get(i).getDeepCopy(true);
+      Piece piece = pieces.get(i).getDeepCopy();
+      piece.setTeam(true);
       piece.moveTo(0, piece.col());
       pieces.add(piece);
 
@@ -541,14 +543,6 @@ public final class Board implements BoardInterface {
     return Collections.unmodifiableList(history);
   }
 
-  private List<Piece> getEnemyPieces(boolean isTop) {
-    return pieces.stream().filter(m -> m.isTop() != isTop).collect(Collectors.toList());
-  }
-
-  private List<Piece> getFriendlyPieces(boolean isTop) {
-    return getEnemyPieces(!isTop);
-  }
-
   private Set<Square> getValidPositions(Piece piece) {
     return piece
         .getPossiblePositions()
@@ -574,6 +568,24 @@ public final class Board implements BoardInterface {
    */
   public Piece getAt(int row, int col) {
     return pieces.stream().filter(m -> m.isAt(row, col)).findAny().orElse(null);
+  }
+
+  public Piece getRook(boolean isTop, boolean left) {
+    return pieces
+        .stream()
+        .filter(m -> m.isTop() == isTop && m instanceof Rook)
+        .sorted(Comparator.comparingInt(Piece::col))
+        .skip(left ? 0 : 1)
+        .findFirst()
+        .orElse(null);
+  }
+
+  private List<Piece> getEnemyPieces(boolean isTop) {
+    return pieces.stream().filter(m -> m.isTop() != isTop).collect(Collectors.toList());
+  }
+
+  private List<Piece> getFriendlyPieces(boolean isTop) {
+    return getEnemyPieces(!isTop);
   }
 
   private Piece getKingOfTeam(boolean isTop) {

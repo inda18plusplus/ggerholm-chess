@@ -49,11 +49,11 @@ public abstract class Piece {
   }
 
   public Set<Square> getPossiblePositions() {
-    return new HashSet<>(possiblePositions);
+    return possiblePositions;
   }
 
   public Set<Square> getPossibleAttackPositions() {
-    return new HashSet<>(possibleAttacks);
+    return possibleAttacks;
   }
 
   public State getState() {
@@ -129,6 +129,10 @@ public abstract class Piece {
     return isTop;
   }
 
+  public void setTeam(boolean isTop) {
+    this.isTop = isTop;
+  }
+
   /**
    * Returns whether or not an action is allowed to be executed.
    *
@@ -173,20 +177,6 @@ public abstract class Piece {
       System.exit(1);
       return null;
     }
-  }
-
-  /**
-   * Creates a deep copy of the piece. Also potentially changes the team of the piece.
-   *
-   * @param switchTeam True if the piece is to be swapped to the opposite team.
-   * @return The deep copy.
-   */
-  public Piece getDeepCopy(boolean switchTeam) {
-    Piece copy = getDeepCopy();
-    if (switchTeam) {
-      copy.isTop = !copy.isTop;
-    }
-    return copy;
   }
 
   /**
