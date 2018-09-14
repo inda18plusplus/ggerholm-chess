@@ -16,7 +16,8 @@ public class RuleKingCastling implements Rule {
     }
 
     Piece piece = action.getPiece();
-    Piece target = board.getRook(piece.isTop(), action.col() < piece.col());
+    boolean queenSide = action.col() < piece.col();
+    Piece target = board.getRook(piece.isTop(), queenSide);
 
     if (!(piece instanceof King) || !(target instanceof Rook)) {
       return Result.Invalid;
@@ -34,8 +35,9 @@ public class RuleKingCastling implements Rule {
       return Result.NotPassed;
     }
 
+    int distance = Math.abs(action.col() - piece.col());
     int dir = (int) Math.signum(target.col() - piece.col());
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i <= distance; i++) {
       if (board.isSquareUnderAttack(piece.row(), piece.col() + i * dir, piece.isTop(), false)) {
         return Result.NotPassed;
       }
