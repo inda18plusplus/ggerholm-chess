@@ -32,7 +32,7 @@ public interface BoardInterface {
   }
 
   enum GameType {
-    Standard, Fischer
+    Standard
   }
 
   /**
@@ -41,13 +41,6 @@ public interface BoardInterface {
    * @param topFirst Whether or not the top team should make the first move.
    */
   void setupStandardBoard(boolean topFirst);
-
-  /**
-   * Setups a standard board but with the pieces on the first ranks of each team shuffled.
-   *
-   * @param topFirst Whether or not the top team should make the first move.
-   */
-  void setupFischerBoard(boolean topFirst);
 
   /**
    * Setups an empty board.

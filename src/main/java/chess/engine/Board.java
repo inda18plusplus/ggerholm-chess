@@ -15,14 +15,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public final class Board implements BoardInterface {
 
@@ -99,65 +95,6 @@ public final class Board implements BoardInterface {
       }
 
     }
-
-  }
-
-  @Override
-  public void setupFischerBoard(boolean topFirst) {
-    setupEmptyBoard(topFirst);
-    gameType = GameType.Fischer;
-
-    Random rand = new Random();
-
-    int firstBishop = rand.nextInt(BOARD_LENGTH);
-    int secondBishop = rand.nextInt(BOARD_LENGTH);
-    while (secondBishop % 2 == firstBishop % 2) {
-      secondBishop = rand.nextInt(BOARD_LENGTH);
-    }
-
-    pieces.add(new Bishop(7, firstBishop, false));
-    pieces.add(new Bishop(7, secondBishop, false));
-
-    Set<Integer> setup = new HashSet<>();
-    setup.add(firstBishop);
-    setup.add(secondBishop);
-
-    Supplier<Integer> get = () -> {
-      int i = rand.nextInt(BOARD_LENGTH);
-      while (setup.contains(i)) {
-        i = rand.nextInt(BOARD_LENGTH);
-      }
-      return i;
-    };
-
-    int queen = get.get();
-    pieces.add(new Queen(7, queen, false));
-    setup.add(queen);
-
-    int knight = get.get();
-    pieces.add(new Knight(7, knight, false));
-    setup.add(knight);
-
-    knight = get.get();
-    pieces.add(new Knight(7, knight, false));
-    setup.add(knight);
-
-    int[] a = IntStream.range(0, 8).filter(m -> !setup.contains(m)).sorted().toArray();
-
-    pieces.add(new Rook(7, a[0], false));
-    pieces.add(new Rook(7, a[2], false));
-    pieces.add(new King(7, a[1], false));
-
-    for (int i = 0; i < BOARD_LENGTH; i++) {
-      Piece piece = pieces.get(i).getDeepCopy();
-      piece.setTeam(true);
-      piece.moveTo(0, piece.col());
-      pieces.add(piece);
-
-      pieces.add(new Pawn(1, i, true));
-      pieces.add(new Pawn(6, i, false));
-    }
-
 
   }
 
