@@ -29,7 +29,7 @@ public final class Action {
    * @param type The type of the move, either Attack or Move.
    */
   public Action(Piece piece, int row, int col, Type type) {
-    this.piece = piece.getShallowCopy();
+    this.piece = piece.getDeepCopy();
     this.row = row;
     this.col = col;
     this.type = type;

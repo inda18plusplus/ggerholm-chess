@@ -14,11 +14,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public final class Board implements BoardInterface {
 
@@ -103,60 +106,56 @@ public final class Board implements BoardInterface {
     setupEmptyBoard(topFirst);
     gameType = GameType.Fischer;
 
-    List<Class<? extends Piece>> topTeam = new ArrayList<>();
-    topTeam.add(King.class);
-    topTeam.add(Queen.class);
-    topTeam.add(Rook.class);
-    topTeam.add(Rook.class);
-    topTeam.add(Bishop.class);
-    topTeam.add(Bishop.class);
-    topTeam.add(Knight.class);
-    topTeam.add(Knight.class);
-
-    List<Class<? extends Piece>> bottomTeam = new ArrayList<>(topTeam);
-
     Random rand = new Random();
 
-    for (int i = 0; i < BOARD_LENGTH * 2; i++) {
-      switch (i) {
-        case 0:
-        case 1:
-        case 2:
-        case 3:
-        case 4:
-        case 5:
-        case 6:
-        case 7:
-          pieces.add(new Pawn(1, i, true));
-          pieces.add(new Pawn(6, i, false));
-          break;
-        default:
-          int topChoice = rand.nextInt(topTeam.size());
-          int bottomChoice = rand.nextInt(bottomTeam.size());
-          try {
-            Piece top = topTeam.get(topChoice)
-                .getConstructor(int.class, int.class, boolean.class)
-                .newInstance(0, i % 8, true);
-            Piece bottom = bottomTeam.get(bottomChoice)
-                .getConstructor(int.class, int.class, boolean.class)
-                .newInstance(7, i % 8, false);
-
-            pieces.add(top);
-            pieces.add(bottom);
-            topTeam.remove(topChoice);
-            bottomTeam.remove(bottomChoice);
-
-
-          } catch (InstantiationException
-              | IllegalAccessException
-              | InvocationTargetException
-              | NoSuchMethodException e) {
-            e.printStackTrace();
-            System.exit(1);
-          }
-          break;
-      }
+    int firstBishop = rand.nextInt(BOARD_LENGTH);
+    int secondBishop = rand.nextInt(BOARD_LENGTH);
+    while (secondBishop % 2 == firstBishop % 2) {
+      secondBishop = rand.nextInt(BOARD_LENGTH);
     }
+
+    pieces.add(new Bishop(7, firstBishop, false));
+    pieces.add(new Bishop(7, secondBishop, false));
+
+    Set<Integer> setup = new HashSet<>();
+    setup.add(firstBishop);
+    setup.add(secondBishop);
+
+    Supplier<Integer> get = () -> {
+      int i = rand.nextInt(BOARD_LENGTH);
+      while (setup.contains(i)) {
+        i = rand.nextInt(BOARD_LENGTH);
+      }
+      return i;
+    };
+
+    int queen = get.get();
+    pieces.add(new Queen(7, queen, false));
+    setup.add(queen);
+
+    int knight = get.get();
+    pieces.add(new Knight(7, knight, false));
+    setup.add(knight);
+
+    knight = get.get();
+    pieces.add(new Knight(7, knight, false));
+    setup.add(knight);
+
+    int[] a = IntStream.range(0, 8).filter(m -> !setup.contains(m)).sorted().toArray();
+
+    pieces.add(new Rook(7, a[0], false));
+    pieces.add(new Rook(7, a[2], false));
+    pieces.add(new King(7, a[1], false));
+
+    for (int i = 0; i < BOARD_LENGTH; i++) {
+      Piece piece = pieces.get(i).getDeepCopy(true);
+      piece.moveTo(0, piece.col());
+      pieces.add(piece);
+
+      pieces.add(new Pawn(1, i, true));
+      pieces.add(new Pawn(6, i, false));
+    }
+
 
   }
 
@@ -241,7 +240,6 @@ public final class Board implements BoardInterface {
       return false;
     }
 
-    // --- Check if the attackers can be captured ---
     List<Piece> attackers = getEnemyPieces(isTop)
         .stream()
         .filter(m -> m.isAllowed(this, new Action(m, king.pos(), Action.Type.Attack)))
@@ -595,23 +593,23 @@ public final class Board implements BoardInterface {
   }
 
   /**
-   * Creates a deep copy of the current board. Changes executed to the shallow copy will not
-   * interfere with the original instance.
+   * Creates a deep copy of the current board. Changes executed to the deep copy will not interfere
+   * with the original instance.
    *
-   * @return A shallow copy of the board.
+   * @return A deep copy of the board.
    */
   public Board getDeepCopy() {
-    Board shallow = new Board();
-    shallow.pieces = new ArrayList<>(pieces)
+    Board copy = new Board();
+    copy.pieces = new ArrayList<>(pieces)
         .stream()
-        .map(Piece::getShallowCopy)
+        .map(Piece::getDeepCopy)
         .collect(Collectors.toList());
-    shallow.history = new ArrayList<>(history);
-    shallow.turn = turn;
-    shallow.promoteAfterAction = promoteAfterAction;
-    shallow.promotionIndex = promotionIndex;
-    shallow.selected = selected;
-    return shallow;
+    copy.history = new ArrayList<>(history);
+    copy.turn = turn;
+    copy.promoteAfterAction = promoteAfterAction;
+    copy.promotionIndex = promotionIndex;
+    copy.selected = selected;
+    return copy;
   }
 
   @Override

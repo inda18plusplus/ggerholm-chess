@@ -149,22 +149,22 @@ public abstract class Piece {
   }
 
   /**
-   * Creates a shallow copy of the piece. Changes made to the shallow copy will not interfere with
-   * the original.
+   * Creates a deep copy of the piece. Changes made to the deep copy will not interfere with the
+   * original.
    *
-   * @return A piece object if a shallow copy was successfully created, otherwise null.
+   * @return A piece object if a deep copy was successfully created, otherwise null.
    */
-  public Piece getShallowCopy() {
-    Piece shallow;
+  public Piece getDeepCopy() {
+    Piece copy;
 
     try {
-      shallow = this.getClass()
+      copy = this.getClass()
           .getConstructor(int.class, int.class, boolean.class)
           .newInstance(position.row(), position.col(), isTop);
-      shallow.state = state;
-      shallow.hasMoved = hasMoved;
-      shallow.redoPositions();
-      return shallow;
+      copy.state = state;
+      copy.hasMoved = hasMoved;
+      copy.redoPositions();
+      return copy;
     } catch (InstantiationException
         | IllegalAccessException
         | InvocationTargetException
@@ -173,6 +173,20 @@ public abstract class Piece {
       System.exit(1);
       return null;
     }
+  }
+
+  /**
+   * Creates a deep copy of the piece. Also potentially changes the team of the piece.
+   *
+   * @param switchTeam True if the piece is to be swapped to the opposite team.
+   * @return The deep copy.
+   */
+  public Piece getDeepCopy(boolean switchTeam) {
+    Piece copy = getDeepCopy();
+    if (switchTeam) {
+      copy.isTop = !copy.isTop;
+    }
+    return copy;
   }
 
   /**
