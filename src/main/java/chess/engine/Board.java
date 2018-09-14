@@ -570,6 +570,13 @@ public final class Board implements BoardInterface {
     return pieces.stream().filter(m -> m.isAt(row, col)).findAny().orElse(null);
   }
 
+  /**
+   * Returns either the rook furthest to the left or right.
+   *
+   * @param isTop Which team's rook to look for.
+   * @param left The one furthest left or right.
+   * @return The rook piece or null if none was found.
+   */
   public Piece getRook(boolean isTop, boolean left) {
     return pieces
         .stream()
