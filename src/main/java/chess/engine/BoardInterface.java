@@ -5,6 +5,8 @@ import chess.engine.pieces.Knight;
 import chess.engine.pieces.Piece;
 import chess.engine.pieces.Queen;
 import chess.engine.pieces.Rook;
+import chess.game.drawables.DrawablePiece;
+import java.util.List;
 
 public interface BoardInterface {
 
@@ -65,6 +67,8 @@ public interface BoardInterface {
    * @return True if a viable piece was selected, otherwise false.
    */
   boolean selectPieceAt(int row, int col);
+
+  boolean hasSelected();
 
   /**
    * Attempts to move the selected unit to the provided square. If the square is currently occupied,
@@ -140,6 +144,8 @@ public interface BoardInterface {
    * @return An integer. Each valid move increases the turn by one.
    */
   int getTurn();
+
+  List<DrawablePiece> getDrawables();
 
   /**
    * Returns the full engine instance that can be manipulated in ways not possible in an ordinary

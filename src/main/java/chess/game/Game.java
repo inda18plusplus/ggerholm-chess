@@ -1,6 +1,7 @@
 package chess.game;
 
 import chess.engine.Board;
+import chess.engine.BoardInterface;
 import chess.game.drawables.DrawablePiece;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -19,7 +20,7 @@ public class Game extends JFrame implements Runnable {
   private int marginX;
   private int marginY;
 
-  private Board board;
+  private BoardInterface board;
   private List<DrawablePiece> pieces;
 
   private Game() {
@@ -33,7 +34,7 @@ public class Game extends JFrame implements Runnable {
   private void start() {
     createFrame();
 
-    board = Board.getInstance().getEngine();
+    board = Board.getInstance();
     board.setupStandardBoard(false);
     pieces = board.getDrawables();
 
@@ -78,6 +79,8 @@ public class Game extends JFrame implements Runnable {
 
       }
     });
+
+    // TODO: Selection of promotion
   }
 
   private void update(float dt) {

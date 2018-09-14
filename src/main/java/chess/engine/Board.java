@@ -197,6 +197,11 @@ public final class Board implements BoardInterface {
   }
 
   @Override
+  public boolean hasSelected() {
+    return selected != null;
+  }
+
+  @Override
   public boolean goTo(int row, int col) {
     if (isPromoting()) {
       return false;
@@ -378,6 +383,11 @@ public final class Board implements BoardInterface {
     return turn;
   }
 
+  @Override
+  public List<DrawablePiece> getDrawables() {
+    return pieces.stream().map(DrawablePiece::new).collect(Collectors.toList());
+  }
+
   /**
    * Makes it so that the next action done must be a promotion of a Pawn.
    */
@@ -436,10 +446,6 @@ public final class Board implements BoardInterface {
 
     selected.setState(Piece.State.Alive);
     selected = null;
-  }
-
-  public boolean hasSelected() {
-    return selected != null;
   }
 
   private boolean moveTo(int row, int col) {
@@ -526,10 +532,6 @@ public final class Board implements BoardInterface {
     }
 
     return true;
-  }
-
-  public List<DrawablePiece> getDrawables() {
-    return pieces.stream().map(DrawablePiece::new).collect(Collectors.toList());
   }
 
   /**
