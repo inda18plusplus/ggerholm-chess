@@ -23,7 +23,7 @@ public class KingCastlingTest {
     board.addPiece(new King(7, 4, false));
 
     assertTrue(board.selectPieceAt(0, 4));
-    assertTrue(board.goTo(0, 2));
+    assertTrue(board.doCastling(true));
 
     assertEquals(board.getAt(0, 2).getClass(), King.class);
     assertEquals(board.getAt(0, 3).getClass(), Rook.class);

@@ -1,10 +1,11 @@
 package chess.engine.rules;
 
 import chess.engine.Action;
+import chess.engine.Action.Type;
 import chess.engine.Board;
 import chess.engine.pieces.Piece;
+import chess.engine.pieces.Rook;
 import chess.engine.pieces.Square;
-
 import java.util.Set;
 
 public final class RuleNoOverlap implements Rule {
@@ -49,8 +50,16 @@ public final class RuleNoOverlap implements Rule {
 
         final int fR = r;
         final int fC = c;
-        if (positions.stream().anyMatch(m -> m.isAt(fR, fC)) && board.getAt(r, c) != null) {
-          return Result.NotPassed;
+        if (positions.stream().anyMatch(m -> m.isAt(fR, fC))) {
+          Piece other = board.getAt(r, c);
+
+          if (action.getType() == Type.Castling && other instanceof Rook) {
+            continue;
+          }
+
+          if (other != null) {
+            return Result.NotPassed;
+          }
         }
 
       }

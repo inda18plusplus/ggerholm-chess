@@ -1,5 +1,6 @@
 package chess.engine;
 
+import chess.engine.Action.Type;
 import chess.engine.pieces.Bishop;
 import chess.engine.pieces.King;
 import chess.engine.pieces.Knight;
@@ -15,10 +16,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public final class Board implements BoardInterface {
 
@@ -99,6 +104,64 @@ public final class Board implements BoardInterface {
   }
 
   @Override
+  public void setupFischerBoard(boolean topFirst) {
+    setupEmptyBoard(topFirst);
+    gameType = GameType.Fischer;
+
+    Random r = new Random();
+
+    int firstBishop = r.nextInt(BOARD_LENGTH);
+    int secondBishop = r.nextInt(BOARD_LENGTH);
+    while (secondBishop % 2 == firstBishop % 2) {
+      secondBishop = r.nextInt(BOARD_LENGTH);
+    }
+
+    pieces.add(new Bishop(7, firstBishop, false));
+    pieces.add(new Bishop(7, secondBishop, false));
+
+    Set<Integer> setup = new HashSet<>();
+    setup.add(firstBishop);
+    setup.add(secondBishop);
+
+    Supplier<Integer> random = () -> {
+      int i = r.nextInt(BOARD_LENGTH);
+      while (setup.contains(i)) {
+        i = r.nextInt(BOARD_LENGTH);
+      }
+      return i;
+    };
+
+    int queen = random.get();
+    pieces.add(new Queen(7, queen, false));
+    setup.add(queen);
+
+    int knight = random.get();
+    pieces.add(new Knight(7, knight, false));
+    setup.add(knight);
+
+    knight = random.get();
+    pieces.add(new Knight(7, knight, false));
+    setup.add(knight);
+
+    int[] lastPos = IntStream.range(0, 8).filter(m -> !setup.contains(m)).sorted().toArray();
+    pieces.add(new Rook(7, lastPos[0], false));
+    pieces.add(new Rook(7, lastPos[2], false));
+    pieces.add(new King(7, lastPos[1], false));
+
+    for (int i = 0; i < BOARD_LENGTH; i++) {
+      Piece piece = pieces.get(i).getDeepCopy();
+      piece.setTeam(true);
+      piece.moveTo(0, piece.col());
+      pieces.add(piece);
+
+      pieces.add(new Pawn(1, i, true));
+      pieces.add(new Pawn(6, i, false));
+    }
+
+
+  }
+
+  @Override
   public void setupEmptyBoard(boolean topFirst) {
     pieces.clear();
     history.clear();
@@ -154,6 +217,33 @@ public final class Board implements BoardInterface {
     } else {
       return captureAt(row, col);
     }
+  }
+
+  @Override
+  public boolean doCastling(boolean queenSide) {
+    if (isPromoting()) {
+      return false;
+    }
+
+    if (!(selected instanceof King)) {
+      return false;
+    }
+
+    int row = selected.row();
+    int col = queenSide ? 2 : 6;
+    Action action = new Action(selected, row, col, Type.Castling);
+    action.insertAct(true, () -> selected.moveTo(row, col));
+
+    if (!selected.isAllowed(this, action)) {
+      return false;
+    }
+
+    if (takeAction(action, false, 2)) {
+      clearSelected();
+      return true;
+    }
+
+    return false;
   }
 
   @Override
@@ -508,10 +598,10 @@ public final class Board implements BoardInterface {
   }
 
   /**
-   * Returns either the rook furthest to the left or right.
+   * Returns the rook furthest to the left or right.
    *
    * @param isTop Which team's rook to look for.
-   * @param left The one furthest left or right.
+   * @param left The one furthest to the left or right.
    * @return The rook piece or null if none was found.
    */
   public Piece getRook(boolean isTop, boolean left) {

@@ -32,7 +32,7 @@ public interface BoardInterface {
   }
 
   enum GameType {
-    Standard
+    Standard, Fischer
   }
 
   /**
@@ -41,6 +41,13 @@ public interface BoardInterface {
    * @param topFirst Whether or not the top team should make the first move.
    */
   void setupStandardBoard(boolean topFirst);
+
+  /**
+   * Setups a standard board but with the pieces on the first ranks of each team shuffled.
+   *
+   * @param topFirst Whether or not the top team should make the first move.
+   */
+  void setupFischerBoard(boolean topFirst);
 
   /**
    * Setups an empty board.
@@ -72,6 +79,8 @@ public interface BoardInterface {
    * @return True if the move was successful, otherwise false.
    */
   boolean goTo(int row, int col);
+
+  boolean doCastling(boolean queenSide);
 
   /**
    * Returns whether or not the king is currently threatened.

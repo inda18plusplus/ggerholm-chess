@@ -10,7 +10,7 @@ import java.util.Optional;
 public final class Action {
 
   public enum Type {
-    Move, Attack
+    Move, Attack, Castling
   }
 
   private String note;
