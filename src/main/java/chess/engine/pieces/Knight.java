@@ -36,7 +36,7 @@ public class Knight extends Piece {
 
   @Override
   public char toChar() {
-    return isTop() ? 'H' : 'h';
+    return isTop() ? 'N' : 'n';
   }
 
 }

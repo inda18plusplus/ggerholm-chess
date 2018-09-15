@@ -135,8 +135,8 @@ public class DrawablePiece {
       case 'k':
         name = "King";
         break;
-      case 'H':
-      case 'h':
+      case 'N':
+      case 'n':
         name = "Knight";
         break;
       case 'B':
