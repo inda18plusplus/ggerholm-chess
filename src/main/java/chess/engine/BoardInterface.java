@@ -5,7 +5,6 @@ import chess.engine.pieces.Knight;
 import chess.engine.pieces.Piece;
 import chess.engine.pieces.Queen;
 import chess.engine.pieces.Rook;
-import chess.game.drawables.DrawablePiece;
 import java.util.List;
 
 public interface BoardInterface {
@@ -147,7 +146,7 @@ public interface BoardInterface {
    */
   int getTurn();
 
-  List<DrawablePiece> getDrawables();
+  List<Piece> getPieces();
 
   /**
    * Returns the full engine instance that can be manipulated in ways not possible in an ordinary

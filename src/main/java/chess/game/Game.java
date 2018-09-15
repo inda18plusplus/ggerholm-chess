@@ -9,6 +9,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferStrategy;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.swing.JFrame;
 
 public class Game extends JFrame implements Runnable {
@@ -36,7 +37,7 @@ public class Game extends JFrame implements Runnable {
 
     board = Board.getInstance();
     board.setupStandardBoard(false);
-    pieces = board.getDrawables();
+    pieces = board.getPieces().stream().map(DrawablePiece::new).collect(Collectors.toList());
 
     setupInput();
 
@@ -86,7 +87,7 @@ public class Game extends JFrame implements Runnable {
   private void update(float dt) {
 
     if (pieces.stream().anyMatch(DrawablePiece::requiresReload)) {
-      pieces = board.getDrawables();
+      pieces = board.getPieces().stream().map(DrawablePiece::new).collect(Collectors.toList());
     }
 
     pieces.forEach(m -> m.update(dt));
@@ -114,7 +115,7 @@ public class Game extends JFrame implements Runnable {
     g.setColor(board.isTopTurn() ? Color.WHITE : Color.BLACK);
     g.drawRect(0, 0, boardSize, boardSize);
 
-    g.drawString(board.getGameState().name(), -marginX / 2, 50);
+    g.drawString(board.getGameState().name(), -marginX * 0.75f, 50);
 
   }
 

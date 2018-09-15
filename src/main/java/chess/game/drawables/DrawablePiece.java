@@ -82,21 +82,26 @@ public class DrawablePiece {
       return;
     }
 
-    g.setColor(Color.GREEN);
-    piece.getPossiblePositions().forEach(m -> g.fillOval(
-        m.col() * Game.SQUARE_SIZE + Game.SQUARE_SIZE / 4,
-        m.row() * Game.SQUARE_SIZE + Game.SQUARE_SIZE / 4,
-        Game.SQUARE_SIZE / 2,
-        Game.SQUARE_SIZE / 2
-    ));
+    piece.getPossiblePositions().forEach(m ->
+        g.drawImage(
+            ResourceManager.getInstance().getImage("dot"),
+            m.col() * Game.SQUARE_SIZE + Game.SQUARE_SIZE / 4,
+            m.row() * Game.SQUARE_SIZE + Game.SQUARE_SIZE / 4,
+            Game.SQUARE_SIZE / 2,
+            Game.SQUARE_SIZE / 2,
+            null)
+    );
 
-    g.setColor(Color.RED);
-    piece.getPossibleAttackPositions().forEach(m -> g.fillRect(
-        m.col() * Game.SQUARE_SIZE + Game.SQUARE_SIZE * 3 / 8,
-        m.row() * Game.SQUARE_SIZE + Game.SQUARE_SIZE * 3 / 8,
-        Game.SQUARE_SIZE / 4,
-        Game.SQUARE_SIZE / 4
-    ));
+    piece.getPossibleAttackPositions().forEach(m ->
+        g.drawImage(
+            ResourceManager.getInstance().getImage("sqr"),
+            m.col() * Game.SQUARE_SIZE + Game.SQUARE_SIZE * 3 / 8,
+            m.row() * Game.SQUARE_SIZE + Game.SQUARE_SIZE * 3 / 8,
+            Game.SQUARE_SIZE / 4,
+            Game.SQUARE_SIZE / 4,
+            null)
+    );
+
   }
 
   public boolean isSelected() {

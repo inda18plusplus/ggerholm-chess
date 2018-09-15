@@ -10,7 +10,6 @@ import chess.engine.pieces.Queen;
 import chess.engine.pieces.Rook;
 import chess.engine.pieces.Square;
 import chess.engine.rules.Rule;
-import chess.game.drawables.DrawablePiece;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -411,8 +410,8 @@ public final class Board implements BoardInterface {
   }
 
   @Override
-  public List<DrawablePiece> getDrawables() {
-    return pieces.stream().map(DrawablePiece::new).collect(Collectors.toList());
+  public List<Piece> getPieces() {
+    return new ArrayList<>(pieces);
   }
 
   /**
