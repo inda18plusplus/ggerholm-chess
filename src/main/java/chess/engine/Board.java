@@ -202,7 +202,7 @@ public final class Board implements BoardInterface {
   }
 
   @Override
-  public boolean goTo(int row, int col) {
+  public boolean tryGoTo(int row, int col) {
     if (isPromoting()) {
       return false;
     }

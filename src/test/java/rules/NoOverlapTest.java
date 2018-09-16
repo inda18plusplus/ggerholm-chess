@@ -14,10 +14,10 @@ public class NoOverlapTest {
     board.setupStandardBoard(true);
 
     assertTrue(board.selectPieceAt(0, 0));
-    assertFalse(board.goTo(3, 0));
+    assertFalse(board.tryGoTo(3, 0));
 
     assertTrue(board.selectPieceAt(0, 2));
-    assertFalse(board.goTo(4, 6));
+    assertFalse(board.tryGoTo(4, 6));
 
   }
 
@@ -27,7 +27,7 @@ public class NoOverlapTest {
     board.setupStandardBoard(true);
 
     assertTrue(board.selectPieceAt(0, 1));
-    assertTrue(board.goTo(2, 2));
+    assertTrue(board.tryGoTo(2, 2));
   }
 
 }

@@ -77,7 +77,7 @@ public interface BoardInterface {
    * @param col The targeted column.
    * @return True if the move was successful, otherwise false.
    */
-  boolean goTo(int row, int col);
+  boolean tryGoTo(int row, int col);
 
   boolean doCastling(boolean queenSide);
 

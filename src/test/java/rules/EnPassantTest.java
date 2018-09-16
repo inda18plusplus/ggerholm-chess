@@ -15,10 +15,10 @@ public class EnPassantTest {
 
     board.forceMove(6, 1, 3, 1);
     assertTrue(board.selectPieceAt(1, 0)); // Select piece test
-    assertTrue(board.goTo(3, 0)); // 2 steps forward test
+    assertTrue(board.tryGoTo(3, 0)); // 2 steps forward test
 
     assertTrue(board.selectPieceAt(3, 1)); // Select opponent piece test
-    assertTrue(board.goTo(2, 0)); // En Passant test
+    assertTrue(board.tryGoTo(2, 0)); // En Passant test
   }
 
   @Test
@@ -29,10 +29,10 @@ public class EnPassantTest {
     board.forceMove(6, 1, 3, 1);
     board.forceMove(1, 0, 2, 0);
     assertTrue(board.selectPieceAt(2, 0));
-    assertTrue(board.goTo(3, 0));
+    assertTrue(board.tryGoTo(3, 0));
 
     assertTrue(board.selectPieceAt(3, 1));
-    assertFalse(board.goTo(2, 0));
+    assertFalse(board.tryGoTo(2, 0));
   }
 
   @Test
@@ -42,16 +42,16 @@ public class EnPassantTest {
 
     board.forceMove(6, 1, 4, 1);
     assertTrue(board.selectPieceAt(1, 0));
-    assertTrue(board.goTo(3, 0));
+    assertTrue(board.tryGoTo(3, 0));
 
     assertTrue(board.selectPieceAt(4, 1));
-    assertTrue(board.goTo(3, 1));
+    assertTrue(board.tryGoTo(3, 1));
 
     assertTrue(board.selectPieceAt(1, 5));
-    assertTrue(board.goTo(3, 5));
+    assertTrue(board.tryGoTo(3, 5));
 
     assertTrue(board.selectPieceAt(3, 1));
-    assertFalse(board.goTo(2, 0));
+    assertFalse(board.tryGoTo(2, 0));
   }
 
 }

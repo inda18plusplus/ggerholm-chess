@@ -22,7 +22,7 @@ public class PawnPromotionTest {
     board.forceMove(1, 0, 6, 0);
 
     assertTrue(board.selectPieceAt(6, 0));
-    assertTrue(board.goTo(7, 0));
+    assertTrue(board.tryGoTo(7, 0));
     assertTrue(board.isPromoting());
     assertTrue(board.promoteTo(BoardInterface.Promotion.Queen));
 

@@ -111,7 +111,7 @@ public class BoardTest {
     board.addPiece(new King(7, 6, false));
 
     assertTrue(board.selectPieceAt(7, 7));
-    assertFalse(board.goTo(7, 6));
+    assertFalse(board.tryGoTo(7, 6));
 
   }
 

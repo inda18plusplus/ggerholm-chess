@@ -71,7 +71,7 @@ public class Game extends JFrame implements Runnable {
         }
 
         if (board.hasSelected()) {
-          if (board.goTo(row, col)) {
+          if (board.tryGoTo(row, col)) {
             return;
           }
         }
