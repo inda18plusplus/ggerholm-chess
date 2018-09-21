@@ -81,7 +81,6 @@ public class Game extends JFrame implements Runnable {
       }
     });
 
-    // TODO: Selection of promotion
   }
 
   private void update(float dt) {
