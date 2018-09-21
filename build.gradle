@@ -5,8 +5,8 @@ plugins {
 
 version '1.0'
 
-sourceCompatibility = JavaVersion.VERSION_1_10
-targetCompatibility = JavaVersion.VERSION_1_10
+sourceCompatibility = 1.10
+targetCompatibility = 1.10
 
 task fatJar(type: Jar) {
     manifest {
