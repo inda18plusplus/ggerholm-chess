@@ -3,7 +3,6 @@ package chess.game.drawables;
 import chess.engine.pieces.Piece;
 import chess.game.Game;
 import chess.game.ResourceManager;
-
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -39,11 +38,14 @@ public class DrawablePiece {
     float horizontalMove = drawX - piece.col() * Game.SQUARE_SIZE;
     float verticalMove = drawY - piece.row() * Game.SQUARE_SIZE;
 
-    if (Math.abs(horizontalMove) > 1 || Math.abs(verticalMove) > 1) {
+    float speed = 5; // Pixels per frame.
+    if (Math.abs(horizontalMove) > speed * 2 || Math.abs(verticalMove) > speed * 2) {
       float dir = (float) Math.atan2(verticalMove, horizontalMove);
-      float speed = 5; // Pixels per frame.
       drawX += -Math.min(speed, Math.abs(horizontalMove)) * dt * Math.cos(dir);
       drawY += -Math.min(speed, Math.abs(verticalMove)) * dt * Math.sin(dir);
+    } else {
+      drawX = piece.col() * Game.SQUARE_SIZE;
+      drawY = piece.row() * Game.SQUARE_SIZE;
     }
 
   }
@@ -84,21 +86,21 @@ public class DrawablePiece {
 
     piece.getPossiblePositions().forEach(m ->
         g.drawImage(
-            ResourceManager.getInstance().getImage("dot"),
-            m.col() * Game.SQUARE_SIZE + Game.SQUARE_SIZE / 4,
-            m.row() * Game.SQUARE_SIZE + Game.SQUARE_SIZE / 4,
-            Game.SQUARE_SIZE / 2,
-            Game.SQUARE_SIZE / 2,
+            ResourceManager.getInstance().getImage("moveSqr"),
+            m.col() * Game.SQUARE_SIZE,
+            m.row() * Game.SQUARE_SIZE,
+            Game.SQUARE_SIZE,
+            Game.SQUARE_SIZE,
             null)
     );
 
     piece.getPossibleAttackPositions().forEach(m ->
         g.drawImage(
-            ResourceManager.getInstance().getImage("sqr"),
-            m.col() * Game.SQUARE_SIZE + Game.SQUARE_SIZE * 3 / 8,
-            m.row() * Game.SQUARE_SIZE + Game.SQUARE_SIZE * 3 / 8,
-            Game.SQUARE_SIZE / 4,
-            Game.SQUARE_SIZE / 4,
+            ResourceManager.getInstance().getImage("attackSqr"),
+            m.col() * Game.SQUARE_SIZE + Game.SQUARE_SIZE / 8,
+            m.row() * Game.SQUARE_SIZE + Game.SQUARE_SIZE / 8,
+            Game.SQUARE_SIZE * 6 / 8,
+            Game.SQUARE_SIZE * 6 / 8,
             null)
     );
 

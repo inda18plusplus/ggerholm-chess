@@ -6,6 +6,7 @@ import chess.engine.rules.Rule;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -49,11 +50,11 @@ public abstract class Piece {
   }
 
   public Set<Square> getPossiblePositions() {
-    return possiblePositions;
+    return Collections.unmodifiableSet(possiblePositions);
   }
 
   public Set<Square> getPossibleAttackPositions() {
-    return possibleAttacks;
+    return Collections.unmodifiableSet(possibleAttacks);
   }
 
   public State getState() {

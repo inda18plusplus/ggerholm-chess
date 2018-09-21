@@ -19,8 +19,8 @@ public class ResourceManager {
       loadImage("white" + name, "/images/white" + name + ".png");
     }
 
-    loadImage("dot", "/images/greenDot.png");
-    loadImage("sqr", "/images/redSquare.png");
+    loadImage("moveSqr", "/images/greenSquare.png");
+    loadImage("attackSqr", "/images/redSquare.png");
   }
 
   public static ResourceManager getInstance() {

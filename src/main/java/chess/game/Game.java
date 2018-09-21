@@ -81,6 +81,9 @@ public class Game extends JFrame implements Runnable {
       }
     });
 
+    // TODO: Promotion
+    // TODO: Use the castling method on the board
+
   }
 
   private void update(float dt) {
@@ -93,6 +96,9 @@ public class Game extends JFrame implements Runnable {
 
   }
 
+  private Color light = new Color(255, 178, 127);
+  private Color dark = new Color(183, 126, 91);
+
   private void render(Graphics2D g) {
     g.setColor(board.isTopTurn() ? Color.BLACK : Color.WHITE);
     g.fillRect(0, 0, windowWidth, windowHeight);
@@ -104,7 +110,7 @@ public class Game extends JFrame implements Runnable {
     g.translate(marginX, marginY);
 
     for (int i = 0; i < length * length; i++) {
-      g.setColor(i % 2 == i / length % 2 ? Color.WHITE : Color.BLACK);
+      g.setColor(i % 2 == i / length % 2 ? light : dark);
       g.fillRect(i % length * SQUARE_SIZE, i / length * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE);
     }
 
@@ -114,7 +120,9 @@ public class Game extends JFrame implements Runnable {
     g.setColor(board.isTopTurn() ? Color.WHITE : Color.BLACK);
     g.drawRect(0, 0, boardSize, boardSize);
 
-    g.drawString(board.getGameState().name(), -marginX * 0.75f, 50);
+    String turn = board.isTopTurn() ? "Black's turn" : "White's turn";
+    g.drawString(turn, -marginX * 0.75f, 50);
+    g.drawString(board.getGameState().name(), -marginX * 0.75f, 75);
 
   }
 
