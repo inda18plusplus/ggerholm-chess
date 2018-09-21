@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'checkstyle'
 }
 
 version '1.0'
@@ -16,6 +17,11 @@ task fatJar(type: Jar) {
     baseName = project.name + '-all'
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
+}
+
+checkstyle {
+    toolVersion '8.11'
+    configFile file('google_checks.xml')
 }
 
 repositories {
