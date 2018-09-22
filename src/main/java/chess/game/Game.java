@@ -75,10 +75,13 @@ public class Game extends JFrame implements Runnable {
             if (board.isPromoting()) {
               this.promote();
             }
+
+            return;
           }
-        } else {
-          board.selectPieceAt(row, col);
         }
+
+        board.selectPieceAt(row, col);
+
       }
 
       private void promote() {

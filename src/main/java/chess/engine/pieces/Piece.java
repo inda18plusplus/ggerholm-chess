@@ -3,10 +3,8 @@ package chess.engine.pieces;
 import chess.engine.Action;
 import chess.engine.Board;
 import chess.engine.rules.Rule;
-
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -50,11 +48,11 @@ public abstract class Piece {
   }
 
   public Set<Square> getPossiblePositions() {
-    return Collections.unmodifiableSet(possiblePositions);
+    return new HashSet<>(possiblePositions);
   }
 
   public Set<Square> getPossibleAttackPositions() {
-    return Collections.unmodifiableSet(possibleAttacks);
+    return new HashSet<>(possibleAttacks);
   }
 
   public State getState() {
