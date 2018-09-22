@@ -73,7 +73,7 @@ public class Game extends JFrame implements Runnable {
         if (board.hasSelected()) {
           if (board.tryGoTo(row, col)) {
             if (board.isPromoting()) {
-              this.queryPromotion();
+              this.promote();
             }
           }
         } else {
@@ -81,14 +81,12 @@ public class Game extends JFrame implements Runnable {
         }
       }
 
-      private void queryPromotion() {
-        System.out.println("Promotion required!");
+      private void promote() {
+        BoardInterface.Promotion promotion = PromotionDialog.queryPiece(rootPane);
       }
     });
 
-    // TODO: Promotion
     // TODO: Use the castling method on the board
-
   }
 
   private void update(float dt) {
