@@ -83,6 +83,8 @@ public class Game extends JFrame implements Runnable {
 
       private void promote() {
         BoardInterface.Promotion promotion = PromotionDialog.queryPiece(rootPane);
+
+        board.promoteTo(promotion);
       }
     });
 
