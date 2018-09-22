@@ -24,6 +24,9 @@ public class Game extends JFrame implements Runnable {
   private BoardInterface board;
   private List<DrawablePiece> pieces;
 
+  private Color light = new Color(255, 178, 127);
+  private Color dark = new Color(183, 126, 91);
+
   private Game() {
   }
 
@@ -103,9 +106,6 @@ public class Game extends JFrame implements Runnable {
     pieces.forEach(m -> m.update(dt));
 
   }
-
-  private Color light = new Color(255, 178, 127);
-  private Color dark = new Color(183, 126, 91);
 
   private void render(Graphics2D g) {
     g.setColor(board.isTopTurn() ? Color.BLACK : Color.WHITE);
