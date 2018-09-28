@@ -31,6 +31,8 @@ public interface BoardInterface {
           return Promotion.Rook;
         case 'n':
           return Promotion.Knight;
+        default:
+          break;
       }
       return null;
     }

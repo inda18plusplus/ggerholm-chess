@@ -25,6 +25,12 @@ public class ConnectedGame implements Runnable {
     this.board = board;
   }
 
+  /**
+   * Connect to the given IPv4 address.
+   *
+   * @param targetAddress The address given in IPv4 format.
+   * @throws IOException If the connection failed.
+   */
   public void connect(String targetAddress) throws IOException {
     connectionMgr = new ConnectionManager();
     connectionMgr.connect(targetAddress);
@@ -39,11 +45,20 @@ public class ConnectedGame implements Runnable {
     isTopTeam = false;
   }
 
+  /**
+   * Call when a move has been made to has to be transmitted to the opponent.
+   *
+   * @param action The action that was executed.
+   * @param promotion The promotion that took place, if any.
+   */
   public void moveMade(Action action, char promotion) {
     activeJsonBatch = actionToJson(action, promotion);
     networkThread.notify();
   }
 
+  /**
+   * Runs the network utilities.
+   */
   public void run() {
 
     // TODO: Testing
