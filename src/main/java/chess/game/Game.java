@@ -2,6 +2,7 @@ package chess.game;
 
 import chess.engine.Board;
 import chess.engine.BoardInterface;
+import chess.engine.Utils;
 import chess.game.drawables.DrawablePiece;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -84,7 +85,6 @@ public class Game extends JFrame implements Runnable {
         }
 
         board.selectPieceAt(row, col);
-
       }
 
       private void promote() {

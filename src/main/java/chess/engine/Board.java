@@ -174,6 +174,10 @@ public final class Board implements BoardInterface {
     return gameType;
   }
 
+  public boolean selectPieceAt(Square square) {
+    return selectPieceAt(square.row(), square.col());
+  }
+
   @Override
   public boolean selectPieceAt(int row, int col) {
     if (isPromoting()) {
@@ -199,6 +203,10 @@ public final class Board implements BoardInterface {
   @Override
   public boolean hasSelected() {
     return selected != null;
+  }
+
+  public boolean tryGoTo(Square square) {
+    return tryGoTo(square.row(), square.col());
   }
 
   @Override

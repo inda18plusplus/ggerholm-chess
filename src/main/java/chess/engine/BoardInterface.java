@@ -21,6 +21,20 @@ public interface BoardInterface {
       this.type = type;
     }
 
+    public static Promotion fromChar(char c) {
+      switch (Character.toLowerCase(c)) {
+        case 'q':
+          return Promotion.Queen;
+        case 'b':
+          return Promotion.Bishop;
+        case 'r':
+          return Promotion.Rook;
+        case 'n':
+          return Promotion.Knight;
+      }
+      return null;
+    }
+
   }
 
   enum State {
