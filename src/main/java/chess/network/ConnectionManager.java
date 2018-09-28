@@ -3,6 +3,7 @@ package chess.network;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.net.Socket;
 
 class ConnectionManager {
@@ -13,8 +14,15 @@ class ConnectionManager {
   private DataInputStream inputStream;
   private DataOutputStream outputStream;
 
-  void connect(String targetAddress) throws IOException {
+  void connectToHost(String targetAddress) throws IOException {
     socket = new Socket(targetAddress, port);
+    inputStream = new DataInputStream(socket.getInputStream());
+    outputStream = new DataOutputStream(socket.getOutputStream());
+  }
+
+  void listenForConnections() throws IOException {
+    ServerSocket serverSocket = new ServerSocket(port);
+    socket = serverSocket.accept();
     inputStream = new DataInputStream(socket.getInputStream());
     outputStream = new DataOutputStream(socket.getOutputStream());
   }
@@ -51,7 +59,7 @@ class ConnectionManager {
   }
 
   boolean isConnected() {
-    return socket.isConnected();
+    return socket != null && socket.isConnected();
   }
 
 }

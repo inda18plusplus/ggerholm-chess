@@ -170,6 +170,15 @@ public final class Board implements BoardInterface {
   }
 
   @Override
+  public Action getLastMove() {
+    if (history.isEmpty()) {
+      return null;
+    }
+
+    return history.get(history.size() - 1);
+  }
+
+  @Override
   public GameType getGameType() {
     return gameType;
   }
@@ -232,16 +241,17 @@ public final class Board implements BoardInterface {
       return false;
     }
 
-    if (!(selected instanceof King)) {
+    if (selected != null && !(selected instanceof King)) {
       return false;
     }
 
-    int row = selected.row();
+    Piece king = selected == null ? getKingOfTeam(isTopTurn()) : selected;
+    int row = king.row();
     int col = queenSide ? 2 : 6;
-    Action action = new Action(selected, row, col, Type.Castling);
-    action.insertAct(true, () -> selected.moveTo(row, col));
+    Action action = new Action(king, row, col, Type.Castling);
+    action.insertAct(true, () -> king.moveTo(row, col));
 
-    if (!selected.isAllowed(this, action)) {
+    if (!king.isAllowed(this, action)) {
       return false;
     }
 

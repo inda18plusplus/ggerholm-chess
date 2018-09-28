@@ -2,13 +2,16 @@ package chess.game;
 
 import chess.engine.Board;
 import chess.engine.BoardInterface;
-import chess.engine.Utils;
 import chess.game.drawables.DrawablePiece;
+import chess.network.ConnectedGame;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferStrategy;
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.swing.JFrame;
@@ -28,6 +31,8 @@ public class Game extends JFrame implements Runnable {
   private Color light = new Color(255, 178, 127);
   private Color dark = new Color(183, 126, 91);
 
+  private ConnectedGame multiPlayer;
+
   private Game() {
   }
 
@@ -40,13 +45,19 @@ public class Game extends JFrame implements Runnable {
     createFrame();
 
     board = Board.getInstance();
-    board.setupStandardBoard(false);
-    pieces = board.getPieces().stream().map(DrawablePiece::new).collect(Collectors.toList());
+    resetBoard();
+
+    multiPlayer = new ConnectedGame(board.getEngine());
 
     setupInput();
 
     Thread thread = new Thread(this);
     thread.start();
+  }
+
+  private void resetBoard() {
+    board.setupStandardBoard(false);
+    pieces = board.getPieces().stream().map(DrawablePiece::new).collect(Collectors.toList());
   }
 
   private void createFrame() {
@@ -60,11 +71,15 @@ public class Game extends JFrame implements Runnable {
   private void setupInput() {
     addMouseListener(new MouseAdapter() {
       @Override
-      public void mouseClicked(MouseEvent e) {
-        super.mouseClicked(e);
+      public void mouseClicked(MouseEvent event) {
+        super.mouseClicked(event);
 
-        int row = (e.getY() - marginY) / SQUARE_SIZE;
-        int col = (e.getX() - marginX) / SQUARE_SIZE;
+        if (!multiPlayer.isOurTurn()) {
+          return;
+        }
+
+        int row = (event.getY() - marginY) / SQUARE_SIZE;
+        int col = (event.getX() - marginX) / SQUARE_SIZE;
 
         if (row < 0 || col < 0) {
           return;
@@ -76,9 +91,12 @@ public class Game extends JFrame implements Runnable {
 
         if (board.hasSelected()) {
           if (board.tryGoTo(row, col)) {
+            char promotion = 0;
             if (board.isPromoting()) {
-              this.promote();
+              promotion = promote();
             }
+
+            multiPlayer.moveMade(board.getLastMove(), promotion);
 
             return;
           }
@@ -87,14 +105,49 @@ public class Game extends JFrame implements Runnable {
         board.selectPieceAt(row, col);
       }
 
-      private void promote() {
+      private char promote() {
         BoardInterface.Promotion promotion = PromotionDialog.queryPiece(rootPane);
-
         board.promoteTo(promotion);
+        return promotion.charCode();
       }
     });
 
-    // TODO: Use the castling method on the board
+    addKeyListener(new KeyAdapter() {
+      @Override
+      public void keyReleased(KeyEvent event) {
+        super.keyReleased(event);
+
+        int key = event.getKeyCode();
+
+        try {
+          if (key == KeyEvent.VK_L) {
+            multiPlayer.connect(null);
+            resetBoard();
+          } else if (key == KeyEvent.VK_K) {
+            multiPlayer.connect("localhost");
+            resetBoard();
+          }
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+
+        if (multiPlayer.isOurTurn()) {
+
+          if (key == KeyEvent.VK_Q) {
+            if (board.doCastling(true)) {
+              multiPlayer.moveMade(board.getLastMove());
+            }
+          } else if (key == KeyEvent.VK_R) {
+            if (board.doCastling(false)) {
+              multiPlayer.moveMade(board.getLastMove());
+            }
+          }
+
+        }
+
+      }
+    });
+
   }
 
   private void update(float dt) {

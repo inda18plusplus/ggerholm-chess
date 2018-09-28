@@ -21,6 +21,21 @@ public interface BoardInterface {
       this.type = type;
     }
 
+    public char charCode() {
+      switch (this) {
+        case Queen:
+          return 'q';
+        case Bishop:
+          return 'b';
+        case Rook:
+          return 'r';
+        case Knight:
+          return 'n';
+        default:
+          return 0;
+      }
+    }
+
     public static Promotion fromChar(char c) {
       switch (Character.toLowerCase(c)) {
         case 'q':
@@ -70,6 +85,8 @@ public interface BoardInterface {
    * @param topFirst Whether or not the top team should make the first move.
    */
   void setupEmptyBoard(boolean topFirst);
+
+  Action getLastMove();
 
   GameType getGameType();
 

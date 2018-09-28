@@ -4,6 +4,7 @@ import chess.engine.Action;
 import chess.engine.Board;
 import chess.engine.BoardInterface.Promotion;
 import chess.engine.Utils;
+import chess.engine.pieces.King;
 import chess.engine.pieces.Square;
 import java.io.IOException;
 import org.json.JSONObject;
@@ -11,18 +12,19 @@ import org.json.JSONObject;
 public class ConnectedGame implements Runnable {
 
   enum ParseResult {
-    Correct, MissingInfo, InvalidMove
+    Correct, InvalidMove
   }
 
   private ConnectionManager connectionMgr;
   private volatile Board board;
-  private Thread networkThread;
 
   private volatile String activeJsonBatch;
   private boolean isTopTeam;
+  private boolean isHost;
 
-  private ConnectedGame(Board board) {
+  public ConnectedGame(Board board) {
     this.board = board;
+    connectionMgr = new ConnectionManager();
   }
 
   /**
@@ -32,17 +34,52 @@ public class ConnectedGame implements Runnable {
    * @throws IOException If the connection failed.
    */
   public void connect(String targetAddress) throws IOException {
-    connectionMgr = new ConnectionManager();
-    connectionMgr.connect(targetAddress);
+    if (targetAddress == null) {
+      connectionMgr.listenForConnections();
+      isHost = true;
+    } else {
+      connectionMgr.connectToHost(targetAddress);
+      isHost = false;
+    }
 
     decideTurns();
 
-    networkThread = new Thread(this);
+    Thread networkThread = new Thread(this);
     networkThread.start();
   }
 
-  private void decideTurns() {
-    isTopTeam = false;
+  private void decideTurns() throws IOException {
+    // TODO: Implement correctly
+    if (isHost) {
+      String acceptGame = connectionMgr.receive();
+      if (!acceptGame.equalsIgnoreCase("yes")) {
+        connectionMgr.listenForConnections();
+        return;
+      }
+
+      connectionMgr.send("0");
+      isTopTeam = false;
+    } else {
+      connectionMgr.send("yes");
+
+      String hash = connectionMgr.receive();
+      if (hash.equalsIgnoreCase("0")) {
+        isTopTeam = true;
+      }
+    }
+  }
+
+  /**
+   * Returns whether or not it's this client's turn to make a move.
+   *
+   * @return True or false.
+   */
+  public boolean isOurTurn() {
+    if (!connectionMgr.isConnected()) {
+      return true;
+    }
+
+    return board.isTopTurn() == isTopTeam;
   }
 
   /**
@@ -51,44 +88,46 @@ public class ConnectedGame implements Runnable {
    * @param action The action that was executed.
    * @param promotion The promotion that took place, if any.
    */
-  public void moveMade(Action action, char promotion) {
+  public synchronized void moveMade(Action action, char promotion) {
     activeJsonBatch = actionToJson(action, promotion);
-    networkThread.notify();
+    notifyAll();
+  }
+
+  public synchronized void moveMade(Action action) {
+    moveMade(action, (char) 0);
   }
 
   /**
    * Runs the network utilities.
    */
-  public void run() {
-
-    // TODO: Testing
+  public synchronized void run() {
+    boolean firstMove = isOurTurn();
 
     while (connectionMgr.isConnected()) {
 
       try {
         String response = "ok";
-        String data = connectionMgr.receive();
 
-        System.out.println(data);
+        if (!firstMove) {
 
-        if (data == null) {
-          continue;
+          String data = connectionMgr.receive();
+          if (data == null) {
+            continue;
+          }
+
+          switch (parseAndExecuteMove(data)) {
+            case InvalidMove:
+              response = "invalid";
+              break;
+            default:
+              break;
+          }
+
+          JSONObject json = new JSONObject();
+          json.put("response", response);
+          connectionMgr.send(json.toString());
         }
-
-        switch (parseAndExecuteMove(data)) {
-          case Correct:
-            break;
-          case MissingInfo:
-          case InvalidMove:
-            response = "invalid";
-            break;
-          default:
-            break;
-        }
-
-        JSONObject json = new JSONObject();
-        json.append("response", response);
-        connectionMgr.send(json.toString());
+        firstMove = false;
 
         do {
           if (board.isTopTurn() == isTopTeam) {
@@ -96,16 +135,16 @@ public class ConnectedGame implements Runnable {
 
             connectionMgr.send(activeJsonBatch);
             activeJsonBatch = "";
+
           }
 
-          response = connectionMgr.receive();
+          String in = connectionMgr.receive();
+          response = new JSONObject(in).get("response").toString();
           if (response != null) {
 
             if (response.equalsIgnoreCase("ok")) {
               break;
             }
-
-            System.out.println("Invalid");
 
           }
 
@@ -120,46 +159,63 @@ public class ConnectedGame implements Runnable {
 
   private String actionToJson(Action action, char promotion) {
     JSONObject obj = new JSONObject();
-    obj.append("from", Utils.getSourceSquareNotation(action));
-    obj.append("to", Utils.getTargetSquareNotation(action));
-    obj.append("promotion", promotion);
+    obj.put("from", Utils.getSourceSquareNotation(action));
+    obj.put("to", Utils.getTargetSquareNotation(action));
+    obj.put("promotion", promotion > 0 ? promotion : "");
 
     return obj.toString();
   }
 
-  private ParseResult parseAndExecuteMove(String json) {
+  private ParseResult parseAndExecuteMove(String data) {
     Board copy = board.getDeepCopy();
 
-    JSONObject obj = new JSONObject(json);
-    if (!obj.has("from") || !obj.has("to")) {
-      return ParseResult.MissingInfo;
-    }
-
-    Square src = Utils.getSquareFromNotation(obj.getString("from"));
-    if (src == null || !copy.selectPieceAt(src)) {
-      return ParseResult.InvalidMove;
-    }
-
-    Square target = Utils.getSquareFromNotation(obj.getString("to"));
-    if (target == null || !copy.tryGoTo(target)) {
-      return ParseResult.InvalidMove;
-    }
-
+    Square src;
+    Square target;
     Promotion promType = null;
-    if (copy.isPromoting()) {
-      Object promotion = obj.get("promotion");
-      if (promotion == null || promotion.toString().length() != 1) {
+    boolean isCastling = false;
+    try {
+      JSONObject json = new JSONObject(data);
+
+      src = Utils.getSquareFromNotation(json.getString("from"));
+      target = Utils.getSquareFromNotation(json.getString("to"));
+
+      if (src == null || target == null || !copy.selectPieceAt(src)) {
         return ParseResult.InvalidMove;
       }
 
-      promType = Promotion.fromChar(promotion.toString().charAt(0));
-      if (!copy.promoteTo(promType)) {
+      if (copy.getAt(src.row(), src.col()) instanceof King
+          && Math.abs(src.col() - target.col()) == 2) {
+
+        if (!copy.doCastling(src.col() > target.col())) {
+          return ParseResult.InvalidMove;
+        }
+
+        isCastling = true;
+
+      } else if (!copy.tryGoTo(target)) {
         return ParseResult.InvalidMove;
       }
+
+      if (copy.isPromoting()) {
+        Object promotion = json.get("promotion");
+
+        promType = Promotion.fromChar(promotion.toString().charAt(0));
+        if (!copy.promoteTo(promType)) {
+          return ParseResult.InvalidMove;
+        }
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      return ParseResult.InvalidMove;
     }
 
     board.selectPieceAt(src);
-    board.tryGoTo(target);
+    if (isCastling) {
+      board.doCastling(src.col() > target.col());
+    } else {
+      board.tryGoTo(target);
+    }
+
     if (board.isPromoting()) {
       board.promoteTo(promType);
     }
