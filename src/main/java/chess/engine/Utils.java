@@ -18,6 +18,12 @@ public final class Utils {
     return getSquareNotation(action.getPiece().row(), action.getPiece().col());
   }
 
+  /**
+   * Creates a square object from chess position notation.
+   *
+   * @param notation The notation to be converted, i.e "e5".
+   * @return A Square object matching the given position, or null if invalid.
+   */
   public static Square getSquareFromNotation(String notation) {
     if (notation.length() != 2) {
       return null;
