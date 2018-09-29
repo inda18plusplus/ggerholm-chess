@@ -6,6 +6,7 @@ import java.util.Set;
 
 public final class Square {
 
+  private static final char[] chars = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
   private final int row;
   private final int col;
 
@@ -66,6 +67,25 @@ public final class Square {
 
     Square other = (Square) o;
     return other.row == row && other.col == col;
+  }
+
+  @Override
+  public String toString() {
+    return "" + chars[col] + (8 - row);
+  }
+
+  public static Square of(int row, int col) {
+    return new Square(row, col);
+  }
+
+  public static Square of(String notation) {
+    if (notation.length() != 2) {
+      return null;
+    }
+
+    int row = chars.length - Integer.parseInt("" + notation.charAt(1));
+    int col = notation.charAt(0) - 'a';
+    return new Square(row, col);
   }
 
 }

@@ -12,6 +12,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferStrategy;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.swing.JFrame;
@@ -127,7 +128,7 @@ public class Game extends JFrame implements Runnable {
             multiPlayer.connect("localhost");
             resetBoard();
           }
-        } catch (IOException e) {
+        } catch (IOException | NoSuchAlgorithmException e) {
           e.printStackTrace();
         }
 
@@ -161,7 +162,11 @@ public class Game extends JFrame implements Runnable {
   }
 
   private void render(Graphics2D g) {
-    g.setColor(board.isTopTurn() ? Color.BLACK : Color.WHITE);
+    if (multiPlayer.isOurTurn()) {
+      g.setColor(board.isTopTurn() ? Color.BLACK : Color.WHITE);
+    } else {
+      g.setColor(Color.GRAY);
+    }
     g.fillRect(0, 0, windowWidth, windowHeight);
 
     int length = Board.BOARD_LENGTH;

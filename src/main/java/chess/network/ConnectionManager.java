@@ -28,38 +28,32 @@ class ConnectionManager {
   }
 
   void send(String data) throws IOException {
-    if (data == null || data.length() == 0 || outputStream == null) {
+    if (data == null || data.isEmpty() || outputStream == null || !isConnected()) {
       return;
     }
 
-    byte[] bytes = data.getBytes();
-
-    outputStream.writeInt(bytes.length);
-    if (bytes.length > 0) {
-      outputStream.write(bytes, 0, bytes.length);
-    }
+    outputStream.writeUTF(data);
   }
 
   String receive() throws IOException {
-    if (inputStream == null) {
+    if (inputStream == null || !isConnected()) {
       return null;
     }
 
-    int length = inputStream.readInt();
-    byte[] data = new byte[length];
-    if (length > 0) {
-      inputStream.readFully(data);
-    }
-
-    return new String(data);
+    return inputStream.readUTF();
   }
 
   void disconnect() throws IOException {
-    socket.close();
+    if (socket != null && !socket.isClosed()) {
+      socket.close();
+    }
+
+    inputStream = null;
+    outputStream = null;
   }
 
   boolean isConnected() {
-    return socket != null && socket.isConnected();
+    return socket != null && socket.isConnected() && inputStream != null && outputStream != null;
   }
 
 }

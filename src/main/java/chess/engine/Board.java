@@ -122,7 +122,7 @@ public final class Board implements BoardInterface {
     setup.add(firstBishop);
     setup.add(secondBishop);
 
-    Supplier<Integer> random = () -> {
+    Supplier<Integer> randomSquare = () -> {
       int i = r.nextInt(BOARD_LENGTH);
       while (setup.contains(i)) {
         i = r.nextInt(BOARD_LENGTH);
@@ -130,15 +130,15 @@ public final class Board implements BoardInterface {
       return i;
     };
 
-    int queen = random.get();
+    int queen = randomSquare.get();
     pieces.add(new Queen(7, queen, false));
     setup.add(queen);
 
-    int knight = random.get();
+    int knight = randomSquare.get();
     pieces.add(new Knight(7, knight, false));
     setup.add(knight);
 
-    knight = random.get();
+    knight = randomSquare.get();
     pieces.add(new Knight(7, knight, false));
     setup.add(knight);
 
@@ -387,6 +387,10 @@ public final class Board implements BoardInterface {
   @Override
   public boolean promoteTo(Promotion promotion) {
     if (!isPromoting()) {
+      return false;
+    }
+
+    if (promotion == null) {
       return false;
     }
 
@@ -672,7 +676,27 @@ public final class Board implements BoardInterface {
     copy.promoteAfterAction = promoteAfterAction;
     copy.promotionIndex = promotionIndex;
     copy.selected = selected;
+    copy.gameType = gameType;
+    copy.gameState = gameState;
     return copy;
+  }
+
+  public void reset(Board copy) {
+    if (copy == null) {
+      return;
+    }
+
+    this.pieces = new ArrayList<>(copy.pieces)
+        .stream()
+        .map(Piece::getDeepCopy)
+        .collect(Collectors.toList());
+    this.history = new ArrayList<>(copy.history);
+    this.turn = copy.turn;
+    this.promoteAfterAction = copy.promoteAfterAction;
+    this.promotionIndex = copy.promotionIndex;
+    this.selected = copy.selected;
+    this.gameType = copy.gameType;
+    this.gameState = copy.gameState;
   }
 
   @Override

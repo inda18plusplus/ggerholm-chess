@@ -85,6 +85,14 @@ public final class Action {
     return col;
   }
 
+  public Square sourceSquare() {
+    return piece.pos();
+  }
+
+  public Square targetSquare() {
+    return Square.of(row, col);
+  }
+
   /**
    * The piece executing this action.
    *
@@ -117,16 +125,6 @@ public final class Action {
         row,
         col,
         Optional.ofNullable(note).orElse("")).trim();
-  }
-
-  public String getSourceSquareNotation() {
-    char[] chars = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
-    return "" + chars[piece.col()] + (8 - piece.row());
-  }
-
-  public String getDestinationSquareNotation() {
-    char[] chars = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
-    return "" + chars[col] + (8 - row);
   }
 
 }
