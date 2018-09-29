@@ -5,6 +5,9 @@ plugins {
 
 version '1.0'
 
+sourceCompatibility = 10
+targetCompatibility = 10
+
 task fatJar(type: Jar) {
     manifest {
         attributes 'Implementation-Title': 'Chess',

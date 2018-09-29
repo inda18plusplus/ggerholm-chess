@@ -681,6 +681,11 @@ public final class Board implements BoardInterface {
     return copy;
   }
 
+  /**
+   * Resets this board instance to the provided copy.
+   *
+   * @param copy The board instance to which this instance is to be restored to.
+   */
   public void reset(Board copy) {
     if (copy == null) {
       return;

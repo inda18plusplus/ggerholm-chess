@@ -78,6 +78,12 @@ public final class Square {
     return new Square(row, col);
   }
 
+  /**
+   * Creates a Square instance from the notation of a square.
+   *
+   * @param notation The square in its notation form, i.e 'e5'.
+   * @return A Square object.
+   */
   public static Square of(String notation) {
     if (notation.length() != 2) {
       return null;
