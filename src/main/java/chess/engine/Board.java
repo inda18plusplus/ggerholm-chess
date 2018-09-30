@@ -23,13 +23,18 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 
 public final class Board implements BoardInterface {
 
   public static final int BOARD_LENGTH = 8;
 
-  private static BoardInterface instance = new Board();
+  private static BoardInterface instance = new Board(false);
 
+  private Marker instanceMarker;
   private boolean promoteAfterAction;
   private int promotionIndex = -1;
   private int turn;
@@ -41,7 +46,17 @@ public final class Board implements BoardInterface {
   private List<Piece> pieces = new ArrayList<>();
   private List<Action> history = new ArrayList<>();
 
-  private Board() {
+  private final Logger logger;
+
+  private Board(boolean copiedInstance) {
+    if (copiedInstance) {
+      logger = LoggerFactory.getLogger(Board.class.getName() + "#Copy");
+      instanceMarker = MarkerFactory.getMarker("COPIED_INSTANCE");
+    } else {
+      logger = LoggerFactory.getLogger(Board.class);
+      instanceMarker = MarkerFactory.getMarker("MAIN_INSTANCE");
+    }
+
   }
 
   public static BoardInterface getInstance() {
@@ -100,6 +115,7 @@ public final class Board implements BoardInterface {
 
     }
 
+    logger.debug(instanceMarker, "Standard board created.");
   }
 
   @Override
@@ -157,7 +173,7 @@ public final class Board implements BoardInterface {
       pieces.add(new Pawn(6, i, false));
     }
 
-
+    logger.debug(instanceMarker, "Fischer board created.");
   }
 
   @Override
@@ -167,6 +183,7 @@ public final class Board implements BoardInterface {
     turn = topFirst ? 0 : 1;
     selected = null;
     gameType = GameType.Standard;
+    logger.debug(instanceMarker, "Empty board setup.");
   }
 
   @Override
@@ -193,15 +210,19 @@ public final class Board implements BoardInterface {
       return false;
     }
 
+    logger.info(instanceMarker, "Attempting piece selection ({}, {}).", row, col);
+
     clearSelected();
     selected = getAt(row, col);
 
     if (selected != null && isTopTurn() != selected.isTop()) {
       selected = null;
+      logger.debug(instanceMarker, "Piece selection of wrong team.");
       return false;
     }
 
     if (selected != null) {
+      logger.debug(instanceMarker, "Piece selection successful.");
       selected.setState(Piece.State.Selected);
       return true;
     }
@@ -224,7 +245,10 @@ public final class Board implements BoardInterface {
       return false;
     }
 
+    logger.info(instanceMarker, "Attempting move ({}, {}).", row, col);
+
     if (selected == null) {
+      logger.debug(instanceMarker, "No piece selected.");
       return false;
     }
 
@@ -241,7 +265,10 @@ public final class Board implements BoardInterface {
       return false;
     }
 
+    logger.info(instanceMarker, "Attempting castling (queenSide = {}).", queenSide);
+
     if (selected != null && !(selected instanceof King)) {
+      logger.debug(instanceMarker, "Selected piece not of type King.");
       return false;
     }
 
@@ -252,11 +279,13 @@ public final class Board implements BoardInterface {
     action.insertAct(true, () -> king.moveTo(row, col));
 
     if (!king.isAllowed(this, action)) {
+      logger.debug(instanceMarker, "Castling not allowed.");
       return false;
     }
 
     if (takeAction(action, false, 2)) {
       clearSelected();
+      logger.debug(instanceMarker, "Castling successful.");
       return true;
     }
 
@@ -321,14 +350,15 @@ public final class Board implements BoardInterface {
       return true;
     }
 
-    if (pieces.size() == 3) {
+    int size = pieces.size();
+    if (size == 3) {
       if (pieces.stream().filter(m -> m instanceof King).count() == 2
           && pieces.stream().anyMatch(m -> m instanceof Bishop || m instanceof Knight)) {
         return true;
       }
     }
 
-    if (pieces.size() == 4) {
+    if (size == 4) {
       if (getEnemyPieces(true)
           .stream()
           .filter(m -> m instanceof King || m instanceof Bishop)
@@ -394,6 +424,8 @@ public final class Board implements BoardInterface {
       return false;
     }
 
+    logger.info(instanceMarker, "Attempting promotion.");
+
     Piece piece = pieces.get(promotionIndex);
     try {
       Piece promoted = promotion.type.getConstructor(
@@ -417,6 +449,7 @@ public final class Board implements BoardInterface {
     }
 
     piece.setState(Piece.State.Promoted);
+    logger.debug(instanceMarker, "Promotion successful.");
 
     return true;
   }
@@ -497,21 +530,29 @@ public final class Board implements BoardInterface {
   }
 
   private boolean moveTo(int row, int col) {
+    logger.info(instanceMarker, "Attempting movement to {}, {}.", row, col);
+
     Action action = new Action(selected, row, col, Action.Type.Move);
     action.insertAct(true, () -> selected.moveTo(row, col));
     if (!selected.isAllowed(this, action)) {
+      logger.debug(instanceMarker, "Movement disallowed.");
       return false;
     }
 
     if (takeAction(action, false, 1)) {
       clearSelected();
+      logger.debug(instanceMarker, "Movement successful.");
       return true;
     }
+
+    logger.debug(instanceMarker, "Movement failed.");
 
     return false;
   }
 
   private boolean captureAt(int row, int col) {
+    logger.info(instanceMarker, "Attempting capture at {}, {}", row, col);
+
     Action action = new Action(selected, row, col, Action.Type.Attack);
     action.insertAct(true,
         () -> capturePiecesIf(m -> m.isTop() != isTopTurn() && m.isAt(row, col)));
@@ -519,13 +560,17 @@ public final class Board implements BoardInterface {
         () -> selected.moveTo(row, col));
 
     if (!selected.isAllowed(this, action)) {
+      logger.debug(instanceMarker, "Capture disallowed.");
       return false;
     }
 
     if (takeAction(action, false, 2)) {
       clearSelected();
+      logger.debug(instanceMarker, "Capture successful.");
       return true;
     }
+
+    logger.debug(instanceMarker, "Capture failed.");
 
     return false;
   }
@@ -560,7 +605,9 @@ public final class Board implements BoardInterface {
   }
 
   private boolean takeAction(Action action, boolean skipTurn, int minActsExecuted) {
+    logger.debug(instanceMarker, "Attempting action execution ({}).", action.toString());
     if (action.execute() < minActsExecuted) {
+      logger.debug(instanceMarker, "Too few acts executed (min = {}).", minActsExecuted);
       return false;
     }
 
@@ -578,6 +625,8 @@ public final class Board implements BoardInterface {
         }
       }
     }
+
+    logger.debug(instanceMarker, "Action executed successfully.");
 
     return true;
   }
@@ -666,7 +715,7 @@ public final class Board implements BoardInterface {
    * @return A deep copy of the board.
    */
   public Board getDeepCopy() {
-    Board copy = new Board();
+    Board copy = new Board(true);
     copy.pieces = new ArrayList<>(pieces)
         .stream()
         .map(Piece::getDeepCopy)
