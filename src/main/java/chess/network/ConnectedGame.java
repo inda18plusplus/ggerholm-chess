@@ -192,6 +192,8 @@ public class ConnectedGame implements Runnable {
             continue;
           }
 
+          logger.debug("Received: {}", data);
+
           String response = "ok";
           switch (parseAndExecuteMove(data)) {
             case Invalid:
@@ -203,10 +205,10 @@ public class ConnectedGame implements Runnable {
               break;
           }
 
-          JSONObject json = Utils.createJson("response");
-          json.put("response", response);
-          connectionMgr.send(json.toString());
-          logger.debug("Response sent.");
+          JSONObject jsonObj = Utils.createJson("response");
+          jsonObj.put("response", response);
+          connectionMgr.send(jsonObj.toString());
+          logger.debug("Response sent: {}", jsonObj.toString());
         }
         firstMove = false;
 
@@ -218,14 +220,15 @@ public class ConnectedGame implements Runnable {
             wait();
 
             connectionMgr.send(activeJsonBatch);
+            logger.debug("Move sent: {}", activeJsonBatch);
             activeJsonBatch = "";
-            logger.debug("Move sent.");
           }
 
           JSONObject jsonObj = new JSONObject(connectionMgr.receive());
+          logger.debug("Received: {}", jsonObj.toString());
           if (isTypeIncorrect(jsonObj, "response")) {
             board.reset(backup);
-            logger.warn("No response-packet received. Board restored.");
+            logger.warn("Incorrect packet-type. Board restored.");
             continue;
           }
 
@@ -263,7 +266,7 @@ public class ConnectedGame implements Runnable {
     JSONObject obj = Utils.createJson("move");
     obj.put("from", action.sourceSquare().toString());
     obj.put("to", action.targetSquare().toString());
-    obj.put("promotion", validPromotion ? String.valueOf(promotion) : "");
+    obj.put("promotion", validPromotion ? String.valueOf(promotion).toUpperCase() : "");
 
     return obj.toString();
   }
