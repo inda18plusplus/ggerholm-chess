@@ -174,7 +174,7 @@ public class ConnectedGame implements Runnable {
     while (connectionMgr.isConnected()) {
       try {
         if (!firstMove) {
-          if (!receiveMoveAndRespond()) {
+          if (!receiveMove()) {
             continue;
           }
         }
@@ -193,9 +193,7 @@ public class ConnectedGame implements Runnable {
     }
   }
 
-  private boolean receiveMoveAndRespond() throws IOException {
-    logger.debug("Waiting for opponent's move.");
-
+  private boolean receiveMove() throws IOException {
     JSONObject jsonObj = connectionMgr.receiveMove();
     if (jsonObj == null) {
       logger.debug("No move received.");
@@ -203,7 +201,7 @@ public class ConnectedGame implements Runnable {
     }
 
     String response = "ok";
-    switch (parseAndExecuteMove(jsonObj)) {
+    switch (applyMove(jsonObj)) {
       case Invalid:
         response = "invalid";
         logger.debug("Move is invalid.");
@@ -224,7 +222,7 @@ public class ConnectedGame implements Runnable {
     Board backup = board.getDeepCopy();
     do {
       if (board.isTopTurn() == isTopTeam) {
-        logger.debug("Waiting for move.");
+        logger.debug("Waiting for our move.");
         wait();
 
         connectionMgr.send(activeJsonBatch);
@@ -264,7 +262,7 @@ public class ConnectedGame implements Runnable {
     return obj.toString();
   }
 
-  private ParseResult parseAndExecuteMove(JSONObject jsonObj) {
+  private ParseResult applyMove(JSONObject jsonObj) {
     Board copy = board.getDeepCopy();
     logger.debug("Board backup created.");
 
@@ -272,6 +270,8 @@ public class ConnectedGame implements Runnable {
     Square target;
     Promotion promType = null;
     boolean isCastling = false;
+
+    // Parse and apply the move to a temporary board.
 
     try {
       src = Square.of(jsonObj.getString("from"));
@@ -318,6 +318,8 @@ public class ConnectedGame implements Runnable {
       logger.warn("Exception occurred during JSON-parsing: {}", e.getLocalizedMessage());
       return ParseResult.Invalid;
     }
+
+    // Apply the move to the main board if it was successful.
 
     board.selectPieceAt(src);
     if (isCastling) {
