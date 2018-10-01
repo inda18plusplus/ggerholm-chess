@@ -16,6 +16,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.swing.JFrame;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Game extends JFrame implements Runnable {
 
@@ -33,6 +35,7 @@ public class Game extends JFrame implements Runnable {
   private Color dark = new Color(183, 126, 91);
 
   private ConnectedGame multiPlayer;
+  private final Logger logger = LoggerFactory.getLogger(Game.class);
 
   private Game() {
   }
@@ -129,7 +132,7 @@ public class Game extends JFrame implements Runnable {
             resetBoard();
           }
         } catch (IOException | NoSuchAlgorithmException e) {
-          e.printStackTrace();
+          logger.error("Connection failed: {}", e.getLocalizedMessage());
         }
 
         if (multiPlayer.isOurTurn()) {

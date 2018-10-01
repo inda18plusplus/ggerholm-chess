@@ -38,4 +38,24 @@ class Utils {
     return jsonObj;
   }
 
+  static boolean isResponse(JSONObject jsonObj) {
+    return isTypeCorrect(jsonObj, "response");
+  }
+
+  static boolean isMove(JSONObject jsonObj) {
+    return isTypeCorrect(jsonObj, "move");
+  }
+
+  static boolean isNotInitialization(JSONObject jsonObj) {
+    return !isTypeCorrect(jsonObj, "init");
+  }
+
+  private static boolean isTypeCorrect(JSONObject jsonObj, String type) {
+    if (jsonObj == null || !jsonObj.has("type")) {
+      return false;
+    }
+
+    return jsonObj.get("type").toString().equalsIgnoreCase(type);
+  }
+
 }

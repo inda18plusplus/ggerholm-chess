@@ -5,6 +5,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Objects;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +25,7 @@ class ConnectionManager {
     socket = new Socket(targetAddress, port);
     inputStream = new DataInputStream(socket.getInputStream());
     outputStream = new DataOutputStream(socket.getOutputStream());
-    logger.debug("Connection successful.");
+    logger.info("Connection successful.");
   }
 
   void listenForConnections() throws IOException {
@@ -32,7 +34,7 @@ class ConnectionManager {
     socket = serverSocket.accept();
     inputStream = new DataInputStream(socket.getInputStream());
     outputStream = new DataOutputStream(socket.getOutputStream());
-    logger.debug("Connection successful.");
+    logger.info("Connection successful.");
   }
 
   void send(String data) throws IOException {
@@ -41,18 +43,47 @@ class ConnectionManager {
     }
 
     outputStream.writeUTF(data);
-    logger.debug("Data sent: {}", data);
+    logger.info("Data sent: {}", data);
   }
 
-  String receive() throws IOException {
+  private String receive() throws IOException {
     if (inputStream == null || !isConnected()) {
       return null;
     }
 
-    logger.debug("Waiting for packet.");
     String data = inputStream.readUTF();
-    logger.debug("Data received: {}", data);
+    logger.info("Data received: {}", data);
     return data;
+  }
+
+  JSONObject receiveResponse() throws IOException {
+    logger.debug("Waiting for response.");
+    JSONObject jsonObj = new JSONObject(Objects.requireNonNull(receive()));
+    if (!Utils.isResponse(jsonObj)) {
+      return null;
+    }
+
+    return jsonObj;
+  }
+
+  JSONObject receiveMove() throws IOException {
+    logger.debug("Waiting for move.");
+    JSONObject jsonObj = new JSONObject(Objects.requireNonNull(receive()));
+    if (!Utils.isMove(jsonObj)) {
+      return null;
+    }
+
+    return jsonObj;
+  }
+
+  JSONObject receiveInitMessage() throws IOException {
+    logger.debug("Waiting for init-message.");
+    JSONObject jsonObj = new JSONObject(Objects.requireNonNull(receive()));
+    if (Utils.isNotInitialization(jsonObj)) {
+      return null;
+    }
+
+    return jsonObj;
   }
 
   void disconnect() throws IOException {
@@ -63,7 +94,7 @@ class ConnectionManager {
 
     inputStream = null;
     outputStream = null;
-    logger.debug("Disconnection successful.");
+    logger.info("Disconnection successful.");
   }
 
   boolean isConnected() {
