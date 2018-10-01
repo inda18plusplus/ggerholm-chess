@@ -6,7 +6,7 @@ import java.util.Set;
 
 public final class Square {
 
-  private static final char[] chars = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
+  private static final char[] chars = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
   private final int row;
   private final int col;
 
@@ -89,8 +89,9 @@ public final class Square {
       return null;
     }
 
+    notation = notation.toUpperCase();
     int row = chars.length - Integer.parseInt("" + notation.charAt(1));
-    int col = notation.charAt(0) - 'a';
+    int col = notation.charAt(0) - 'A';
     return new Square(row, col);
   }
 

@@ -90,12 +90,12 @@ public class ConnectedGame implements Runnable {
       init.put("type", "init");
       init.put("hash", hash);
       init.put("seed", seed);
-      init.put("choice", String.valueOf(myChoice));
+      init.put("choice", myChoice);
 
       connectionMgr.send(init.toString());
       logger.debug("Seed-packet sent.");
 
-      isTopTeam = myChoice == opponentChoice;
+      isTopTeam = myChoice != opponentChoice;
     } else {
 
       logger.debug("Waiting for init-packet.");
@@ -109,7 +109,9 @@ public class ConnectedGame implements Runnable {
         return;
       }
 
-      init.put("choice", String.valueOf(myChoice));
+      String originalHash = init.get("hash").toString();
+
+      init.put("choice", myChoice);
       connectionMgr.send(init.toString());
       logger.debug("Choice sent.");
       logger.debug("Waiting for reply.");
@@ -126,13 +128,13 @@ public class ConnectedGame implements Runnable {
 
       logger.debug("Validating choices.");
 
-      String hash = opponentChoice + Utils.hash(seed);
-      if (!hash.equals(init.get("hash").toString())) {
-        logger.debug("Packet invalid.");
+      String hash = Utils.hash(opponentChoice + seed.substring(1));
+      if (!hash.equals(originalHash)) {
+        logger.debug("Opponent cheated during initialization.");
         connectionMgr.disconnect();
       }
 
-      isTopTeam = myChoice != opponentChoice;
+      isTopTeam = myChoice == opponentChoice;
     }
 
     logger.debug("Team decided (isTopTeam = {}).", isTopTeam);
