@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 class ConnectionManager {
 
-  private static final int port = 12712;
+  private static final int port = 6606;
 
   private Socket socket;
   private DataInputStream inputStream;
@@ -41,7 +41,7 @@ class ConnectionManager {
     }
 
     outputStream.writeUTF(data);
-    logger.debug("Data sent.");
+    logger.debug("Data sent: {}", data);
   }
 
   String receive() throws IOException {
@@ -50,7 +50,9 @@ class ConnectionManager {
     }
 
     logger.debug("Waiting for packet.");
-    return inputStream.readUTF();
+    String data = inputStream.readUTF();
+    logger.debug("Data received: {}", data);
+    return data;
   }
 
   void disconnect() throws IOException {

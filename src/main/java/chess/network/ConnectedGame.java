@@ -192,8 +192,6 @@ public class ConnectedGame implements Runnable {
             continue;
           }
 
-          logger.debug("Received: {}", data);
-
           String response = "ok";
           switch (parseAndExecuteMove(data)) {
             case Invalid:
@@ -208,7 +206,6 @@ public class ConnectedGame implements Runnable {
           JSONObject jsonObj = Utils.createJson("response");
           jsonObj.put("response", response);
           connectionMgr.send(jsonObj.toString());
-          logger.debug("Response sent: {}", jsonObj.toString());
         }
         firstMove = false;
 
@@ -220,12 +217,10 @@ public class ConnectedGame implements Runnable {
             wait();
 
             connectionMgr.send(activeJsonBatch);
-            logger.debug("Move sent: {}", activeJsonBatch);
             activeJsonBatch = "";
           }
 
           JSONObject jsonObj = new JSONObject(connectionMgr.receive());
-          logger.debug("Received: {}", jsonObj.toString());
           if (isTypeIncorrect(jsonObj, "response")) {
             board.reset(backup);
             logger.warn("Incorrect packet-type. Board restored.");
