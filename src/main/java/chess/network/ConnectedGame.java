@@ -63,8 +63,8 @@ public class ConnectedGame implements Runnable {
 
       logger.debug("Creating seed and hash.");
 
-      String seed = Utils.createSeed(10);
-      String hash = myChoice + Utils.hash(seed);
+      String seed = myChoice + Utils.createSeed(10);
+      String hash = Utils.hash(seed);
 
       JSONObject init = new JSONObject();
       init.put("type", "init");
