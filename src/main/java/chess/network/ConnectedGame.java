@@ -77,10 +77,15 @@ public class ConnectedGame implements Runnable {
       logger.debug("Initial packet sent.");
       logger.debug("Waiting for reply.");
 
+      logger.debug("Packet received.");
       init = new JSONObject(connectionMgr.receive());
-      opponentChoice = Integer.parseInt(init.get("choice").toString());
+      if (isTypeIncorrect(init, "init")) {
+        logger.debug("Incorrect packet-type.");
+        connectionMgr.disconnect();
+        return;
+      }
 
-      logger.debug("Choice-packet received.");
+      opponentChoice = Integer.parseInt(init.get("choice").toString());
 
       init.put("type", "init");
       init.put("hash", hash);
@@ -98,11 +103,10 @@ public class ConnectedGame implements Runnable {
       JSONObject init = new JSONObject(connectionMgr.receive());
 
       logger.debug("Packet received.");
-
-      String type = init.get("type").toString();
-      if (!type.equalsIgnoreCase("init")) {
-        logger.debug("Incorrect packet-type ({}).", type);
+      if (isTypeIncorrect(init, "init")) {
+        logger.debug("Incorrect packet-type.");
         connectionMgr.disconnect();
+        return;
       }
 
       init.put("choice", String.valueOf(myChoice));
@@ -111,6 +115,12 @@ public class ConnectedGame implements Runnable {
       logger.debug("Waiting for reply.");
 
       init = new JSONObject(connectionMgr.receive());
+      if (isTypeIncorrect(init, "init")) {
+        logger.debug("Incorrect packet-type.");
+        connectionMgr.disconnect();
+        return;
+      }
+
       String seed = init.get("seed").toString();
       opponentChoice = Integer.parseInt(init.get("choice").toString());
 
@@ -213,7 +223,7 @@ public class ConnectedGame implements Runnable {
           }
 
           JSONObject jsonObj = new JSONObject(connectionMgr.receive());
-          if (!jsonObj.get("type").toString().equalsIgnoreCase("response")) {
+          if (isTypeIncorrect(jsonObj, "response")) {
             board.reset(backup);
             logger.warn("No response-packet received. Board restored.");
             continue;
@@ -253,7 +263,7 @@ public class ConnectedGame implements Runnable {
     JSONObject obj = Utils.createJson("move");
     obj.put("from", action.sourceSquare().toString());
     obj.put("to", action.targetSquare().toString());
-    obj.put("promotion", validPromotion ? promotion : "");
+    obj.put("promotion", validPromotion ? String.valueOf(promotion) : "");
 
     return obj.toString();
   }
@@ -269,8 +279,8 @@ public class ConnectedGame implements Runnable {
 
     try {
       JSONObject jsonObj = new JSONObject(data);
-      if (!jsonObj.get("type").toString().equalsIgnoreCase("move")) {
-        logger.debug("Invalid packet-type.");
+      if (isTypeIncorrect(jsonObj, "move")) {
+        logger.debug("Incorrect packet-type.");
         return ParseResult.Invalid;
       }
 
@@ -333,6 +343,14 @@ public class ConnectedGame implements Runnable {
     logger.debug("Move executed successfully.");
 
     return ParseResult.Correct;
+  }
+
+  private boolean isTypeIncorrect(JSONObject jsonObj, String type) {
+    if (jsonObj == null || !jsonObj.has("type")) {
+      return true;
+    }
+
+    return !jsonObj.get("type").toString().equalsIgnoreCase(type);
   }
 
 }
