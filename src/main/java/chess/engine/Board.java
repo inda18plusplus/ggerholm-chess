@@ -123,12 +123,12 @@ public final class Board implements BoardInterface {
     setupEmptyBoard(topFirst);
     gameType = GameType.Fischer;
 
-    Random r = new Random();
+    Random randomNumber = new Random();
 
-    int firstBishop = r.nextInt(BOARD_LENGTH);
-    int secondBishop = r.nextInt(BOARD_LENGTH);
+    int firstBishop = randomNumber.nextInt(BOARD_LENGTH);
+    int secondBishop = randomNumber.nextInt(BOARD_LENGTH);
     while (secondBishop % 2 == firstBishop % 2) {
-      secondBishop = r.nextInt(BOARD_LENGTH);
+      secondBishop = randomNumber.nextInt(BOARD_LENGTH);
     }
 
     pieces.add(new Bishop(7, firstBishop, false));
@@ -139,9 +139,9 @@ public final class Board implements BoardInterface {
     setup.add(secondBishop);
 
     Supplier<Integer> randomSquare = () -> {
-      int i = r.nextInt(BOARD_LENGTH);
+      int i = randomNumber.nextInt(BOARD_LENGTH);
       while (setup.contains(i)) {
-        i = r.nextInt(BOARD_LENGTH);
+        i = randomNumber.nextInt(BOARD_LENGTH);
       }
       return i;
     };
@@ -166,7 +166,7 @@ public final class Board implements BoardInterface {
     for (int i = 0; i < BOARD_LENGTH; i++) {
       Piece piece = pieces.get(i).getDeepCopy();
       piece.setTeam(true);
-      piece.moveTo(0, piece.col());
+      piece.resetTo(0, piece.col());
       pieces.add(piece);
 
       pieces.add(new Pawn(1, i, true));

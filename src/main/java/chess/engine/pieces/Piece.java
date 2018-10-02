@@ -67,6 +67,11 @@ public abstract class Piece {
     return hasMoved;
   }
 
+  public void resetTo(int row, int col) {
+    this.position = Square.of(row, col);
+    hasMoved = false;
+  }
+
   /**
    * Moves the piece to the provided square. Also recalculates possible next moves.
    *
@@ -75,7 +80,7 @@ public abstract class Piece {
    */
   public void moveTo(int row, int col) {
     if (!isAt(row, col)) {
-      position = new Square(row, col);
+      position = Square.of(row, col);
       hasMoved = true;
 
       redoPositions();

@@ -2,7 +2,7 @@ package chess.network;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Random;
+import java.security.SecureRandom;
 import org.json.JSONObject;
 
 class Utils {
@@ -14,8 +14,7 @@ class Utils {
     StringBuilder builder = new StringBuilder();
 
     for (byte hashedByte : hashedBytes) {
-      int unsignedByte = 0xFF & hashedByte;
-      builder.append(Integer.toHexString(unsignedByte));
+      builder.append(String.format("%02X", hashedByte));
     }
 
     return builder.toString();
@@ -24,7 +23,7 @@ class Utils {
   static String createSeed(int length) {
     StringBuilder seed = new StringBuilder();
 
-    Random random = new Random();
+    SecureRandom random = new SecureRandom();
     for (int i = 0; i < length; i++) {
       seed.append((char) (65 + random.nextInt(26)));
     }
@@ -38,24 +37,24 @@ class Utils {
     return jsonObj;
   }
 
-  static boolean isResponse(JSONObject jsonObj) {
-    return isTypeCorrect(jsonObj, "response");
+  static boolean isNotResponse(JSONObject jsonObj) {
+    return incorrectType(jsonObj, "response");
   }
 
-  static boolean isMove(JSONObject jsonObj) {
-    return isTypeCorrect(jsonObj, "move");
+  static boolean isNotMove(JSONObject jsonObj) {
+    return incorrectType(jsonObj, "move");
   }
 
   static boolean isNotInitialization(JSONObject jsonObj) {
-    return !isTypeCorrect(jsonObj, "init");
+    return incorrectType(jsonObj, "init");
   }
 
-  private static boolean isTypeCorrect(JSONObject jsonObj, String type) {
+  private static boolean incorrectType(JSONObject jsonObj, String correctType) {
     if (jsonObj == null || !jsonObj.has("type")) {
-      return false;
+      return true;
     }
 
-    return jsonObj.get("type").toString().equalsIgnoreCase(type);
+    return !jsonObj.get("type").toString().equalsIgnoreCase(correctType);
   }
 
 }

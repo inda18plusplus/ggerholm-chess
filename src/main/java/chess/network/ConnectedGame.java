@@ -7,7 +7,7 @@ import chess.engine.pieces.King;
 import chess.engine.pieces.Square;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Random;
+import java.security.SecureRandom;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +56,7 @@ public class ConnectedGame implements Runnable {
   }
 
   private void decideTurns() throws IOException, NoSuchAlgorithmException {
-    int myChoice = new Random().nextInt(2);
+    int myChoice = new SecureRandom().nextInt(2);
     int opponentChoice;
 
     if (isHost) {
@@ -101,7 +101,7 @@ public class ConnectedGame implements Runnable {
         return;
       }
 
-      String originalHash = init.get("hash").toString();
+      final String originalHash = init.get("hash").toString();
       init.put("choice", myChoice);
       connectionMgr.send(init.toString());
       logger.debug("Choice sent.");

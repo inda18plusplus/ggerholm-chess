@@ -59,7 +59,7 @@ class ConnectionManager {
   JSONObject receiveResponse() throws IOException {
     logger.debug("Waiting for response.");
     JSONObject jsonObj = new JSONObject(Objects.requireNonNull(receive()));
-    if (!Utils.isResponse(jsonObj)) {
+    if (Utils.isNotResponse(jsonObj)) {
       return null;
     }
 
@@ -69,7 +69,7 @@ class ConnectionManager {
   JSONObject receiveMove() throws IOException {
     logger.debug("Waiting for move.");
     JSONObject jsonObj = new JSONObject(Objects.requireNonNull(receive()));
-    if (!Utils.isMove(jsonObj)) {
+    if (Utils.isNotMove(jsonObj)) {
       return null;
     }
 
