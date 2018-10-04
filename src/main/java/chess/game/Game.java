@@ -16,6 +16,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -128,7 +129,18 @@ public class Game extends JFrame implements Runnable {
             multiPlayer.connect(null);
             resetBoard();
           } else if (key == KeyEvent.VK_K) {
-            multiPlayer.connect("localhost");
+            String targetAddress = JOptionPane
+                .showInputDialog("Enter a network-local IPv4 address (e.g 192.168.1.95):");
+
+            if (targetAddress == null
+                || targetAddress.isEmpty()
+                || !targetAddress.matches("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}")) {
+
+              multiPlayer.connect("localhost");
+            } else {
+              multiPlayer.connect(targetAddress);
+            }
+
             resetBoard();
           }
         } catch (IOException | NoSuchAlgorithmException e) {
