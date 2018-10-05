@@ -20,15 +20,23 @@ class ConnectionManager {
 
   private final Logger logger = LoggerFactory.getLogger(ConnectionManager.class);
 
-  void connectToHost(String targetAddress) throws IOException {
-    logger.debug("Connecting to host (IP = {}).", targetAddress);
+  void connectToHost(String targetAddress, int port) throws IOException {
+    if (port <= 0) {
+      port = ConnectionManager.port;
+    }
+
+    logger.debug("Connecting to host (IP = {}, port = {}).", targetAddress, port);
     socket = new Socket(targetAddress, port);
     inputStream = new DataInputStream(socket.getInputStream());
     outputStream = new DataOutputStream(socket.getOutputStream());
     logger.info("Connection successful.");
   }
 
-  void listenForConnections() throws IOException {
+  void listenForConnections(int port) throws IOException {
+    if (port <= 0) {
+      port = ConnectionManager.port;
+    }
+
     ServerSocket serverSocket = new ServerSocket(port);
     logger.debug("Waiting for connection at port = {}", port);
     socket = serverSocket.accept();

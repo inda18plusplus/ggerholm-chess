@@ -14,10 +14,10 @@ public final class Action {
   }
 
   private String note;
+  private Type type;
   private final Piece piece;
   private final int row;
   private final int col;
-  private final Type type;
   private final List<Runnable> acts = new ArrayList<>();
 
   /**
@@ -47,6 +47,10 @@ public final class Action {
   int execute() {
     acts.forEach(Runnable::run);
     return acts.size();
+  }
+
+  public void setType(Type type) {
+    this.type = type;
   }
 
   /**

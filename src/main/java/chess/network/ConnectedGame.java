@@ -33,17 +33,19 @@ public class ConnectedGame implements Runnable {
   }
 
   /**
-   * Connect to the given IPv4 address.
+   * Connect to the given address and port or listen at the provided port if the address provided is
+   * null.
    *
-   * @param targetAddress The address given in IPv4 format.
+   * @param ip The address given in IPv4 format or null to listen for connections instead.
+   * @param port The port to connect to or listen at.
    * @throws IOException If the connection failed.
    */
-  public void connect(String targetAddress) throws IOException, NoSuchAlgorithmException {
-    if (targetAddress == null) {
-      connectionMgr.listenForConnections();
+  public void connect(String ip, int port) throws IOException, NoSuchAlgorithmException {
+    if (ip == null) {
+      connectionMgr.listenForConnections(port);
       isHost = true;
     } else {
-      connectionMgr.connectToHost(targetAddress);
+      connectionMgr.connectToHost(ip, port);
       isHost = false;
     }
 
@@ -118,7 +120,6 @@ public class ConnectedGame implements Runnable {
         return;
       }
 
-      String seed = init.get("seed").toString();
       opponentChoice = Integer.parseInt(init.get("choice").toString());
 
       if (opponentChoice != 0 && opponentChoice != 1) {
@@ -127,6 +128,7 @@ public class ConnectedGame implements Runnable {
       }
 
       logger.debug("Validating choices.");
+      String seed = init.get("seed").toString();
       String hash = Utils.hash(opponentChoice + seed.substring(1));
       if (!hash.equals(originalHash)) {
         logger.debug("Opponent cheated during initialization.");

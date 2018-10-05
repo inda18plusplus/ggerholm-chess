@@ -25,28 +25,31 @@ public class RuleKingCastling implements Rule {
     }
 
     if (piece.hasMoved() || target.hasMoved() || piece.row() != target.row()) {
+      action.setType(Type.Move);
       return Result.NotPassed;
     }
 
-    int targetCol = action.col();
+    final int targetCol = action.col();
     if (board.getGameType() == GameType.Fischer) {
+      int fixedCol;
       if (queenSide) {
-        targetCol = 2;
+        fixedCol = 2;
       } else {
-        targetCol = 6;
+        fixedCol = 6;
       }
 
-      final int t = targetCol;
       action.clearActs();
       action.insertAct(true, () ->
-          board.forceMove(piece.row(), piece.col(), piece.row(), t)
+          board.forceMove(piece.row(), piece.col(), piece.row(), fixedCol)
       );
 
     } else if (Math.abs(targetCol - piece.col()) != 2) {
+      action.setType(Type.Move);
       return Result.NotPassed;
     }
 
     if (Rule.NO_OVERLAP.isActionAllowed(board, action) == Result.NotPassed) {
+      action.setType(Type.Move);
       return Result.NotPassed;
     }
 
@@ -54,13 +57,13 @@ public class RuleKingCastling implements Rule {
     int dir = (int) Math.signum(target.col() - piece.col());
     for (int i = 0; i <= distance; i++) {
       if (board.isSquareUnderAttack(piece.row(), piece.col() + i * dir, piece.isTop(), false)) {
+        action.setType(Type.Move);
         return Result.NotPassed;
       }
     }
 
-    final int t = targetCol;
     action.insertAct(true, () ->
-        board.forceMove(target.row(), target.col(), action.row(), t - dir)
+        board.forceMove(target.row(), target.col(), action.row(), targetCol - dir)
     );
     action.insertAct(false, () -> action.setNote("Castling"));
 

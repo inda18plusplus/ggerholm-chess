@@ -126,19 +126,33 @@ public class Game extends JFrame implements Runnable {
 
         try {
           if (key == KeyEvent.VK_L) {
-            multiPlayer.connect(null);
+            String portInput = JOptionPane
+                .showInputDialog("Enter a port to listen at or leave empty to use default:").trim();
+
+            int port = -1;
+            if (portInput.matches("\\d+")) {
+              port = Integer.parseInt(portInput);
+            }
+
+            multiPlayer.connect(null, port);
             resetBoard();
           } else if (key == KeyEvent.VK_K) {
             String targetAddress = JOptionPane
-                .showInputDialog("Enter a network-local IPv4 address (e.g 192.168.1.95):");
+                .showInputDialog("Enter a network-local IPv4 address (:port optional):").trim();
 
-            if (targetAddress == null
-                || targetAddress.isEmpty()
-                || !targetAddress.matches("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}")) {
+            if (targetAddress.isEmpty()) {
+              multiPlayer.connect("localhost", -1);
+            } else if (targetAddress
+                .matches("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}(:\\d+)?")) {
 
-              multiPlayer.connect("localhost");
-            } else {
-              multiPlayer.connect(targetAddress);
+              String ip = targetAddress;
+              int port = -1;
+              if (targetAddress.contains(":")) {
+                ip = targetAddress.substring(0, targetAddress.indexOf(":"));
+                port = Integer.parseInt(targetAddress.substring(targetAddress.indexOf(":") + 1));
+              }
+
+              multiPlayer.connect(ip, port);
             }
 
             resetBoard();
