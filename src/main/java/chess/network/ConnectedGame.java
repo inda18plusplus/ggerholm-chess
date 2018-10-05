@@ -83,6 +83,10 @@ public class ConnectedGame implements Runnable {
       }
 
       opponentChoice = Integer.parseInt(init.get("choice").toString());
+      if (opponentChoice != 0 && opponentChoice != 1) {
+        logger.debug("Opponent cheated during initialization.");
+        connectionMgr.disconnect();
+      }
 
       init.put("type", "init");
       init.put("hash", hash);
@@ -116,6 +120,11 @@ public class ConnectedGame implements Runnable {
 
       String seed = init.get("seed").toString();
       opponentChoice = Integer.parseInt(init.get("choice").toString());
+
+      if (opponentChoice != 0 && opponentChoice != 1) {
+        logger.debug("Opponent cheated during initialization.");
+        connectionMgr.disconnect();
+      }
 
       logger.debug("Validating choices.");
       String hash = Utils.hash(opponentChoice + seed.substring(1));
